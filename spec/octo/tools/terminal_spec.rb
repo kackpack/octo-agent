@@ -386,7 +386,7 @@ RSpec.describe Octo::Tools::Terminal do
     end
 
     it "captures startup output within the collection window" do
-      script = %(ruby -e 'puts "booted"; STDOUT.flush; sleep 5')
+      script = %(bash -c 'echo booted; sleep 5')
       result = tool.execute(command: script, async: true)
       expect(result[:handle_id]).to be_a(String)
       expect(result[:startup_output].to_s).to include("booted")
@@ -401,7 +401,7 @@ RSpec.describe Octo::Tools::Terminal do
 
     it "supports sending input + polling via the handle" do
       # Must still be alive after the 2s background collection window.
-      script = %q{ruby -e 'STDOUT.sync=true; 10.times { |i| puts "tick #{i}"; sleep 0.4 }'}
+      script = %q{bash -c 'for i in {0..9}; do echo "tick $i"; sleep 0.4; done'}
       started = tool.execute(command: script, async: true)
       expect(started[:handle_id]).to be_a(String)
       handle = started[:handle_id]
@@ -915,7 +915,7 @@ RSpec.describe Octo::Tools::Terminal do
 
     it "strips a wrapper echo that appears mid-stream, not anchored to the start" do
       input = "previous output\n" \
-              "{ echo hi\n}; __octo_ec=$?; printf \"\n__CLACKY_DONE_#{token}_%s__\n\" \"$__octo_ec\"\nhi\n"
+              "{ echo hi\n}; __octo_ec=$?; printf \"\n__OCTO_DONE_#{token}_%s__\n\" \"$__octo_ec\"\nhi\n"
       expect(strip(input, token: token)).to eq("previous output\nhi\n")
     end
 

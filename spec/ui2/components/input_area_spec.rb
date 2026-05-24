@@ -150,6 +150,10 @@ RSpec.describe Octo::UI2::Components::InputArea do
 
   describe "history navigation" do
     before do
+      # Prevent stale history from polluting test assertions
+      File.write(Octo::UI2::Components::InputArea::HISTORY_FILE, JSON.generate([]))
+      input_area.instance_variable_set(:@history, [])
+
       input_area.insert_char("F")
       input_area.insert_char("i")
       input_area.insert_char("r")
