@@ -1,7 +1,7 @@
 ---
 name: gem-release
 description: >-
-  Automates the complete process of releasing a new version of the openclacky Ruby
+  Automates the complete process of releasing a new version of the octo Ruby
   gem. Supports both stable releases (auto-increment) and pre-release versions
   (user-specified, e.g., 1.0.0.beta.1). Handles version bumping, testing, building,
   RubyGems publishing, GitHub Releases, and OSS CDN mirroring.
@@ -11,7 +11,7 @@ user-invocable: true
 
 # Gem Release Skill
 
-Automates the complete openclacky gem release workflow via `SKILL_DIR/scripts/release.sh`.
+Automates the complete octo gem release workflow via `SKILL_DIR/scripts/release.sh`.
 
 ## Usage
 
@@ -26,10 +26,10 @@ The release script (`SKILL_DIR/scripts/release.sh`) handles everything end-to-en
 
 1. Pre-release checks (clean working directory, required tools)
 2. Run test suite (`bundle exec rspec`)
-3. Bump version in `lib/clacky/version.rb`
+3. Bump version in `lib/octo/version.rb`
 4. Update `Gemfile.lock` via `bundle install`
 5. Commit and push to origin, wait for CI
-6. Build gem (`gem build openclacky.gemspec`)
+6. Build gem (`gem build octo.gemspec`)
 7. Publish to RubyGems (`gem push`)
 8. Create git tag and push
 9. Create GitHub Release with .gem asset (uses CHANGELOG.md for notes)
@@ -44,7 +44,7 @@ The release script (`SKILL_DIR/scripts/release.sh`) handles everything end-to-en
 
 Read current version:
 ```bash
-grep 'VERSION =' lib/clacky/version.rb
+grep 'VERSION =' lib/octo/version.rb
 ```
 
 **Stable release (default):** Increment patch version (e.g., `1.0.5` → `1.0.6`). Confirm with user if unsure which part to bump (major/minor/patch).
@@ -152,11 +152,11 @@ Fixed:
 - [translate each "Fixed" item]
 - ...
 
-Upgrade: click "Upgrade" in Web UI bottom-left, or `gem update openclacky`
-Fresh install: curl -sSL https://raw.githubusercontent.com/clacky-ai/openclacky/main/scripts/install.sh | bash
+Upgrade: click "Upgrade" in Web UI bottom-left, or `gem update octo`
+Fresh install: curl -sSL https://raw.githubusercontent.com/octo-ai/octo/main/scripts/install.sh | bash
 
-RubyGems: https://rubygems.org/gems/openclacky/versions/{version}
-GitHub: https://github.com/clacky-ai/openclacky/releases/tag/v{version}
+RubyGems: https://rubygems.org/gems/octo/versions/{version}
+GitHub: https://github.com/octo-ai/octo/releases/tag/v{version}
 ```
 
 ## Pre-Release Caveats
@@ -187,8 +187,8 @@ After fixing an issue, you can re-run the script — it's safe to retry. If a pa
 ## File Locations
 
 - Release script: `SKILL_DIR/scripts/release.sh`
-- Version file: `lib/clacky/version.rb`
-- Gem specification: `openclacky.gemspec`
+- Version file: `lib/octo/version.rb`
+- Gem specification: `octo.gemspec`
 - Changelog: `CHANGELOG.md`
 
 ## Dependencies

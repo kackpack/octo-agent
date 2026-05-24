@@ -1,10 +1,10 @@
 # Every AI Agent Feature Is a Cache Invalidation Surface
 
-*May 19, 2026 · Yafei Lee / Founder of OpenClacky*
+*May 19, 2026 · Yafei Lee / Founder of Octo*
 
 ---
 
-I'm Yafei Lee, founder of [OpenClacky](https://github.com/clacky-ai/openclacky), an open-source AI Agent written in Ruby. We wanted an agent with skills, memory, sub-agents, browser automation, dynamic model switching, and long-running sessions. Each of those features made prompt caching worse in a different way.
+I'm Yafei Lee, founder of [Octo](https://github.com/octo-ai/octo), an open-source AI Agent written in Ruby. We wanted an agent with skills, memory, sub-agents, browser automation, dynamic model switching, and long-running sessions. Each of those features made prompt caching worse in a different way.
 
 That was the real architecture problem. Not how to call an LLM, not how to add another tool, not how to orchestrate more agents — how to keep the cache prefix stable while the product keeps changing.
 
@@ -164,7 +164,7 @@ It spawns a sub-agent with its own conversation history but the same 16 tools. W
 
 This matters for caching: a code review skill might read dozens of files and produce a long analysis. Without isolation, all that intermediate work would inflate the main agent's history, triggering compression earlier and costing more. With `invoke_skill`, the main agent's history stays clean.
 
-And for extensibility: need a new capability? Drop a SKILL.md in `~/.clacky/skills/`. The `invoke_skill` tool is always present in the schema; it doesn't need to know about specific skills at compile time. The SKILL.md is read at invocation time. This one tool replaces what would otherwise be ~20 specialized tools, each bloating the schema and increasing the cache invalidation surface.
+And for extensibility: need a new capability? Drop a SKILL.md in `~/.octo/skills/`. The `invoke_skill` tool is always present in the schema; it doesn't need to know about specific skills at compile time. The SKILL.md is read at invocation time. This one tool replaces what would otherwise be ~20 specialized tools, each bloating the schema and increasing the cache invalidation surface.
 
 ---
 
@@ -236,9 +236,9 @@ Our strategy is the opposite of "fill up the context window": compress aggressiv
 
 PDF, Excel, Word, and PowerPoint parsing are common agent needs. Built-in tools would bloat the schema (violates Decision 4) and require C extensions (breaks zero-dependency install). Requiring users to install skills first is bad UX.
 
-Our third path: on first install, copy a set of Python parsing scripts to `~/.clacky/scripts/`, then let the agent maintain them.
+Our third path: on first install, copy a set of Python parsing scripts to `~/.octo/scripts/`, then let the agent maintain them.
 
-When the agent needs to read a PDF, it runs `python3 ~/.clacky/scripts/read_pdf.py <file>` via the `terminal` tool. The tool list doesn't grow. If a script fails (missing dependency, format edge case), the agent can fix the script and `pip install` whatever's needed. The capability isn't hard-coded in the gem. It lives in user-space scripts that the agent itself maintains and improves over time.
+When the agent needs to read a PDF, it runs `python3 ~/.octo/scripts/read_pdf.py <file>` via the `terminal` tool. The tool list doesn't grow. If a script fails (missing dependency, format edge case), the agent can fix the script and `pip install` whatever's needed. The capability isn't hard-coded in the gem. It lives in user-space scripts that the agent itself maintains and improves over time.
 
 Why Python for scripts when the agent is Ruby? Pragmatism. Python's document processing ecosystem (`pdfplumber`, `openpyxl`, `python-docx`) is the most mature. We use the best tool for each layer.
 
@@ -266,7 +266,7 @@ We didn't choose Ruby to be contrarian. We chose it because the things an agent 
 
 Metaprogramming is a genuine advantage here. `method_missing`, `define_method`, `class_eval` — when your agent modifies its own helper scripts at runtime, when skills load dynamically without restart, when tool registration happens through introspection rather than config files, Ruby's metaprogramming pays real dividends.
 
-Distribution is frictionless. `gem install openclacky` — done. Version management, dependency resolution, executable registration (`clacky` command), all out of the box. No virtual environments, no `node_modules`, no build step.
+Distribution is frictionless. `gem install octo` — done. Version management, dependency resolution, executable registration (`octo` command), all out of the box. No virtual environments, no `node_modules`, no build step.
 
 **Zero C extension dependencies.** This took significant engineering effort. Look at our gemspec:
 
@@ -303,7 +303,7 @@ The cost difference isn't about unit price; prompt token pricing is roughly the 
 
 Claude Code's cache hit rate is actually higher than ours (95.2% vs 90.6%). They achieve this partly by having fewer features that conflict with caching. Our agent supports skills, sub-agents, browser automation, dynamic model switching, and idle compression — all things that structurally threaten cache coherence. Getting to 90.6% while supporting all of that is the engineering challenge this post describes.
 
-Full results, per-task breakdowns, and the actual deliverables from each agent are at [openclacky.com/benchmark](https://www.openclacky.com/benchmark).
+Full results, per-task breakdowns, and the actual deliverables from each agent are at [octo.com/benchmark](https://www.octo.com/benchmark).
 
 ---
 
@@ -311,10 +311,10 @@ Full results, per-task breakdowns, and the actual deliverables from each agent a
 
 Everything needed to verify or re-run this comparison is public:
 
-- **Runner script** — [`benchmark/runner.rb`](https://github.com/clacky-ai/openclacky/blob/main/benchmark/runner.rb)
-- **OpenRouter CSV billing data** — [`benchmark/results/`](https://github.com/clacky-ai/openclacky/tree/main/benchmark/results) (per-request cost, cache hit/miss, token counts)
-- **Task prompts and fixtures** — [`benchmark/fixtures/`](https://github.com/clacky-ai/openclacky/tree/main/benchmark/fixtures)
-- **Evaluation report** — [`benchmark/results/EVALUATION_REPORT.md`](https://github.com/clacky-ai/openclacky/blob/main/benchmark/results/EVALUATION_REPORT.md)
+- **Runner script** — [`benchmark/runner.rb`](https://github.com/octo-ai/octo/blob/main/benchmark/runner.rb)
+- **OpenRouter CSV billing data** — [`benchmark/results/`](https://github.com/octo-ai/octo/tree/main/benchmark/results) (per-request cost, cache hit/miss, token counts)
+- **Task prompts and fixtures** — [`benchmark/fixtures/`](https://github.com/octo-ai/octo/tree/main/benchmark/fixtures)
+- **Evaluation report** — [`benchmark/results/EVALUATION_REPORT.md`](https://github.com/octo-ai/octo/blob/main/benchmark/results/EVALUATION_REPORT.md)
 
 We did not cherry-pick runs, post-process outputs, or re-run until numbers looked good. One run per agent, published as-is. This still does not make it a benchmark; it just makes the sanity check auditable. If you find errors in the data, open an issue.
 
@@ -332,12 +332,12 @@ Models get better fast. The things that *won't* be obsoleted by better models ar
 
 ---
 
-OpenClacky is fully open-source under the MIT license. The code behind every decision in this post:
+Octo is fully open-source under the MIT license. The code behind every decision in this post:
 
-- Cache marker logic — [`lib/clacky/client.rb`](https://github.com/clacky-ai/openclacky/blob/main/lib/clacky/client.rb)
-- Insert-then-Compress — [`lib/clacky/agent/message_compressor.rb`](https://github.com/clacky-ai/openclacky/blob/main/lib/clacky/agent/message_compressor.rb)
-- Session context injection — [`lib/clacky/agent.rb`](https://github.com/clacky-ai/openclacky/blob/main/lib/clacky/agent.rb)
-- Idle compression timer — [`lib/clacky/idle_compression_timer.rb`](https://github.com/clacky-ai/openclacky/blob/main/lib/clacky/idle_compression_timer.rb)
-- Browser tool — [`lib/clacky/tools/browser.rb`](https://github.com/clacky-ai/openclacky/blob/main/lib/clacky/tools/browser.rb)
+- Cache marker logic — [`lib/octo/client.rb`](https://github.com/octo-ai/octo/blob/main/lib/octo/client.rb)
+- Insert-then-Compress — [`lib/octo/agent/message_compressor.rb`](https://github.com/octo-ai/octo/blob/main/lib/octo/agent/message_compressor.rb)
+- Session context injection — [`lib/octo/agent.rb`](https://github.com/octo-ai/octo/blob/main/lib/octo/agent.rb)
+- Idle compression timer — [`lib/octo/idle_compression_timer.rb`](https://github.com/octo-ai/octo/blob/main/lib/octo/idle_compression_timer.rb)
+- Browser tool — [`lib/octo/tools/browser.rb`](https://github.com/octo-ai/octo/blob/main/lib/octo/tools/browser.rb)
 
-→ [github.com/clacky-ai/openclacky](https://github.com/clacky-ai/openclacky)
+→ [github.com/octo-ai/octo](https://github.com/octo-ai/octo)

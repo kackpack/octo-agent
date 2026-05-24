@@ -1,6 +1,6 @@
 # Agent-First UI Design Philosophy
 
-> Guiding principle for all OpenClacky UI and feature design.
+> Guiding principle for all Octo UI and feature design.
 
 ---
 
@@ -74,4 +74,4 @@ Clicking "Edit" opens an Agent conversation with context pre-filled. The Agent d
 
 ---
 
-*Applies to all OpenClacky Web UI and feature design.*
+*Applies to all Octo Web UI and feature design.*

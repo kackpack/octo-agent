@@ -32,7 +32,7 @@ configure_homebrew_cn_mirrors() {
     if ! grep -q "HOMEBREW_BOTTLE_DOMAIN" "$SHELL_RC" 2>/dev/null; then
         {
             echo ""
-            echo "# Homebrew CN mirrors (added by openclacky installer)"
+            echo "# Homebrew CN mirrors (added by octo installer)"
             echo "export HOMEBREW_INSTALL_FROM_API=1"
             echo "export HOMEBREW_API_DOMAIN=\"${CN_HOMEBREW_API_DOMAIN}\""
             echo "export HOMEBREW_BREW_GIT_REMOTE=\"${CN_HOMEBREW_BREW_GIT_REMOTE}\""
@@ -50,7 +50,7 @@ configure_homebrew_cn_mirrors() {
 # --------------------------------------------------------------------------
 restore_homebrew_cn_mirrors() {
     if [ -n "$SHELL_RC" ] && [ -f "$SHELL_RC" ] && grep -q "HOMEBREW_BOTTLE_DOMAIN" "$SHELL_RC" 2>/dev/null; then
-        sed -i.bak '/# Homebrew CN mirrors (added by openclacky installer)/d' "$SHELL_RC"
+        sed -i.bak '/# Homebrew CN mirrors (added by octo installer)/d' "$SHELL_RC"
         sed -i.bak '/HOMEBREW_INSTALL_FROM_API/d' "$SHELL_RC"
         sed -i.bak '/HOMEBREW_API_DOMAIN/d' "$SHELL_RC"
         sed -i.bak '/HOMEBREW_BREW_GIT_REMOTE/d' "$SHELL_RC"

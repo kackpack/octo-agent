@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "clacky/ui2/view_renderer"
+require "octo/ui2/view_renderer"
 
-RSpec.describe Clacky::UI2::ViewRenderer do
+RSpec.describe Octo::UI2::ViewRenderer do
   let(:renderer) { described_class.new }
 
   describe "#render_user_message" do

@@ -4,13 +4,13 @@ require "spec_helper"
 
 RSpec.describe "Agent session history" do
   describe "#get_recent_user_messages" do
-    let(:client) { instance_double(Clacky::Client) }
-    let(:config) { Clacky::AgentConfig.new }
-    let(:agent) { Clacky::Agent.new(client, config, working_dir: Dir.pwd, ui: nil, profile: "coding", session_id: Clacky::SessionManager.generate_id, source: :manual) }
+    let(:client) { instance_double(Octo::Client) }
+    let(:config) { Octo::AgentConfig.new }
+    let(:agent) { Octo::Agent.new(client, config, working_dir: Dir.pwd, ui: nil, profile: "coding", session_id: Octo::SessionManager.generate_id, source: :manual) }
 
     before do
       # Simulate a conversation with multiple user/assistant exchanges
-      agent.instance_variable_set(:@history, Clacky::MessageHistory.new([
+      agent.instance_variable_set(:@history, Octo::MessageHistory.new([
         { role: "system", content: "System prompt" },
         { role: "user", content: "First user message" },
         { role: "assistant", content: "First assistant response" },
@@ -48,14 +48,14 @@ RSpec.describe "Agent session history" do
     end
 
     it "handles empty messages array" do
-      agent.instance_variable_set(:@history, Clacky::MessageHistory.new([]))
+      agent.instance_variable_set(:@history, Octo::MessageHistory.new([]))
       messages = agent.get_recent_user_messages(limit: 5)
       
       expect(messages).to be_empty
     end
 
     it "handles messages with only system prompt" do
-      agent.instance_variable_set(:@history, Clacky::MessageHistory.new([
+      agent.instance_variable_set(:@history, Octo::MessageHistory.new([
         { role: "system", content: "System prompt" }
       ]))
       messages = agent.get_recent_user_messages(limit: 5)
@@ -64,7 +64,7 @@ RSpec.describe "Agent session history" do
     end
 
     it "extracts text from array-formatted content (with images)" do
-      agent.instance_variable_set(:@history, Clacky::MessageHistory.new([
+      agent.instance_variable_set(:@history, Octo::MessageHistory.new([
         { role: "system", content: "System prompt" },
         { 
           role: "user", 
@@ -83,7 +83,7 @@ RSpec.describe "Agent session history" do
     end
 
     it "filters out system-injected feedback messages" do
-      agent.instance_variable_set(:@history, Clacky::MessageHistory.new([
+      agent.instance_variable_set(:@history, Octo::MessageHistory.new([
         { role: "system", content: "System prompt" },
         { role: "user", content: "First real user message" },
         { role: "assistant", content: "First response" },
@@ -106,7 +106,7 @@ RSpec.describe "Agent session history" do
     end
 
     it "filters out edit preview error feedback messages" do
-      agent.instance_variable_set(:@history, Clacky::MessageHistory.new([
+      agent.instance_variable_set(:@history, Octo::MessageHistory.new([
         { role: "system", content: "System prompt" },
         { role: "user", content: "Edit this file" },
         { role: "assistant", content: "I'll edit the file", tool_calls: [{ id: "1", function: { name: "edit" } }] },

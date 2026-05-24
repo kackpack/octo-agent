@@ -23,7 +23,7 @@ CN_RUBY_PRECOMPILED_URL="${CN_CDN_BASE_URL}/ruby/ruby-{version}.{platform}.tar.g
 CN_RUBYGEMS_URL="${CN_ALIYUN_MIRROR}/rubygems/"
 CN_NPM_REGISTRY="https://registry.npmmirror.com"
 CN_NODE_MIRROR_URL="https://cdn.npmmirror.com/binaries/node/"
-CN_GEM_BASE_URL="${CN_CDN_BASE_URL}/openclacky"
+CN_GEM_BASE_URL="${CN_CDN_BASE_URL}/octo"
 CN_GEM_LATEST_URL="${CN_GEM_BASE_URL}/latest.txt"
 
 # Active values (set by detect_network_region)

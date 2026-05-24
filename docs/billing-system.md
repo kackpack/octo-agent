@@ -10,7 +10,7 @@ storing them in monthly JSONL files for easy querying and analysis.
 
 - **Non-blocking** — Billing persistence is fire-and-forget; failures never interrupt agent flow
 - **Minimal footprint** — JSONL format, one file per month, no database dependency
-- **Privacy-first** — Data stored locally in `~/.clacky/billing/`, never uploaded
+- **Privacy-first** — Data stored locally in `~/.octo/billing/`, never uploaded
 - **Accurate costing** — Uses the same `ModelPricing` module as real-time display
 
 ---
@@ -30,7 +30,7 @@ storing them in monthly JSONL files for easy querying and analysis.
                                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Billing Module                               │
-│  lib/clacky/billing/                                            │
+│  lib/octo/billing/                                            │
 │    ├── billing_record.rb   (data structure)                     │
 │    └── billing_store.rb    (JSONL persistence)                  │
 └─────────────────────────────────────────────────────────────────┘
@@ -38,7 +38,7 @@ storing them in monthly JSONL files for easy querying and analysis.
                                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Storage                                      │
-│  ~/.clacky/billing/                                             │
+│  ~/.octo/billing/                                             │
 │    ├── 2026-05.jsonl                                            │
 │    ├── 2026-04.jsonl                                            │
 │    └── ...                                                      │
@@ -49,7 +49,7 @@ storing them in monthly JSONL files for easy querying and analysis.
 
 ## Components
 
-### BillingRecord (`lib/clacky/billing/billing_record.rb`)
+### BillingRecord (`lib/octo/billing/billing_record.rb`)
 
 A Struct representing a single API call:
 
@@ -66,12 +66,12 @@ A Struct representing a single API call:
 | `cost_usd` | Float | Calculated cost in USD |
 | `cost_source` | Symbol | `:api`, `:price`, or `:estimated` |
 
-### BillingStore (`lib/clacky/billing/billing_store.rb`)
+### BillingStore (`lib/octo/billing/billing_store.rb`)
 
 Handles persistence and querying:
 
 ```ruby
-store = Clacky::Billing::BillingStore.new
+store = Octo::Billing::BillingStore.new
 
 # Append a record
 store.append(record)
@@ -182,15 +182,15 @@ Returns raw billing records.
 
 ```bash
 # Show current month's billing
-clacky billing
+octo billing
 
 # Show specific period
-clacky billing --period week
-clacky billing --period day
-clacky billing --period all
+octo billing --period week
+octo billing --period day
+octo billing --period all
 
 # Output as JSON (for scripting)
-clacky billing --json
+octo billing --json
 ```
 
 **Sample Output:**
@@ -219,7 +219,7 @@ clacky billing --json
   2026-05-21  $2.3456  ████████████████████████
 
 ──────────────────────────────────────────────────
-  Data stored in: ~/.clacky/billing/
+  Data stored in: ~/.octo/billing/
 ```
 
 ---
@@ -263,7 +263,7 @@ Currency settings apply to:
 
 ### Implementation
 
-Currency preference is stored in browser `localStorage` under key `clacky-currency`.
+Currency preference is stored in browser `localStorage` under key `octo-currency`.
 
 ```javascript
 // Access currency utilities from Billing module
@@ -301,7 +301,7 @@ end
 ## Data Retention
 
 - Records are stored indefinitely by default
-- Monthly files can be manually deleted from `~/.clacky/billing/`
+- Monthly files can be manually deleted from `~/.octo/billing/`
 - Future: `BillingStore#cleanup(before: 1.year.ago)` for automated retention
 
 ---

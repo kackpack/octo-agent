@@ -1,5 +1,5 @@
 #!/bin/bash
-# install_full.sh — OpenClacky full installer (macOS + Linux, with Homebrew)
+# install_full.sh — Octo full installer (macOS + Linux, with Homebrew)
 # Generated from scripts/build/src/install_full.sh.cc — DO NOT EDIT DIRECTLY
 
 set -e
@@ -135,7 +135,7 @@ CN_RUBY_PRECOMPILED_URL="${CN_CDN_BASE_URL}/ruby/ruby-{version}.{platform}.tar.g
 CN_RUBYGEMS_URL="${CN_ALIYUN_MIRROR}/rubygems/"
 CN_NPM_REGISTRY="https://registry.npmmirror.com"
 CN_NODE_MIRROR_URL="https://cdn.npmmirror.com/binaries/node/"
-CN_GEM_BASE_URL="${CN_CDN_BASE_URL}/openclacky"
+CN_GEM_BASE_URL="${CN_CDN_BASE_URL}/octo"
 CN_GEM_LATEST_URL="${CN_GEM_BASE_URL}/latest.txt"
 
 # Active values (set by detect_network_region)
@@ -299,7 +299,7 @@ configure_homebrew_cn_mirrors() {
     if ! grep -q "HOMEBREW_BOTTLE_DOMAIN" "$SHELL_RC" 2>/dev/null; then
         {
             echo ""
-            echo "# Homebrew CN mirrors (added by openclacky installer)"
+            echo "# Homebrew CN mirrors (added by octo installer)"
             echo "export HOMEBREW_INSTALL_FROM_API=1"
             echo "export HOMEBREW_API_DOMAIN=\"${CN_HOMEBREW_API_DOMAIN}\""
             echo "export HOMEBREW_BREW_GIT_REMOTE=\"${CN_HOMEBREW_BREW_GIT_REMOTE}\""
@@ -317,7 +317,7 @@ configure_homebrew_cn_mirrors() {
 # --------------------------------------------------------------------------
 restore_homebrew_cn_mirrors() {
     if [ -n "$SHELL_RC" ] && [ -f "$SHELL_RC" ] && grep -q "HOMEBREW_BOTTLE_DOMAIN" "$SHELL_RC" 2>/dev/null; then
-        sed -i.bak '/# Homebrew CN mirrors (added by openclacky installer)/d' "$SHELL_RC"
+        sed -i.bak '/# Homebrew CN mirrors (added by octo installer)/d' "$SHELL_RC"
         sed -i.bak '/HOMEBREW_INSTALL_FROM_API/d' "$SHELL_RC"
         sed -i.bak '/HOMEBREW_API_DOMAIN/d' "$SHELL_RC"
         sed -i.bak '/HOMEBREW_BREW_GIT_REMOTE/d' "$SHELL_RC"
@@ -488,7 +488,7 @@ configure_gem_source() {
         if grep -q "${CN_RUBYGEMS_URL}" "$gemrc" 2>/dev/null; then
             print_success "gem source already → ${CN_RUBYGEMS_URL}"
         else
-            [ -f "$gemrc" ] && mv "$gemrc" "$HOME/.gemrc_clackybak"
+            [ -f "$gemrc" ] && mv "$gemrc" "$HOME/.gemrc_octobak"
             cat > "$gemrc" <<GEMRC
 :sources:
   - ${CN_RUBYGEMS_URL}
@@ -497,8 +497,8 @@ GEMRC
         fi
     else
         if [ -f "$gemrc" ] && grep -q "${CN_RUBYGEMS_URL}" "$gemrc" 2>/dev/null; then
-            if [ -f "$HOME/.gemrc_clackybak" ]; then
-                mv "$HOME/.gemrc_clackybak" "$gemrc"
+            if [ -f "$HOME/.gemrc_octobak" ]; then
+                mv "$HOME/.gemrc_octobak" "$gemrc"
                 print_info "gem source restored from backup"
             else
                 rm "$gemrc"
@@ -510,7 +510,7 @@ GEMRC
 
 restore_gemrc() {
     local gemrc="$HOME/.gemrc"
-    local gemrc_bak="$HOME/.gemrc_clackybak"
+    local gemrc_bak="$HOME/.gemrc_octobak"
     if [ -f "$gemrc_bak" ]; then
         mv "$gemrc_bak" "$gemrc"
         print_success "~/.gemrc restored from backup"
@@ -540,7 +540,7 @@ setup_gem_home() {
     if [ -n "$SHELL_RC" ] && ! grep -q "GEM_HOME" "$SHELL_RC" 2>/dev/null; then
         {
             echo ""
-            echo "# Ruby user gem dir (added by openclacky installer)"
+            echo "# Ruby user gem dir (added by octo installer)"
             echo "export GEM_HOME=\"\$HOME/.gem/ruby/${ruby_api}\""
             echo "export GEM_PATH=\"\$HOME/.gem/ruby/${ruby_api}\""
             echo "export PATH=\"\$HOME/.gem/ruby/${ruby_api}/bin:\$PATH\""
@@ -555,7 +555,7 @@ restore_gem_home() {
     # Remove the block written by setup_gem_home (comment + 3 export lines)
     local tmp
     tmp=$(mktemp)
-    grep -v "# Ruby user gem dir (added by openclacky installer)" "$SHELL_RC" \
+    grep -v "# Ruby user gem dir (added by octo installer)" "$SHELL_RC" \
         | grep -v "export GEM_HOME=" \
         | grep -v "export GEM_PATH=" \
         | grep -v "/.gem/ruby/" \
@@ -579,7 +579,7 @@ configure_cn_mirrors() {
     if grep -q "${NPM_REGISTRY_URL}" "$npmrc" 2>/dev/null; then
         print_success "npm registry already set → ${NPM_REGISTRY_URL}"
     else
-        [ -f "$npmrc" ] && [ ! -f "$HOME/.npmrc_clackybak" ] && cp "$npmrc" "$HOME/.npmrc_clackybak"
+        [ -f "$npmrc" ] && [ ! -f "$HOME/.npmrc_octobak" ] && cp "$npmrc" "$HOME/.npmrc_octobak"
         if command_exists npm; then
             npm config set registry "$NPM_REGISTRY_URL" 2>/dev/null && \
                 print_success "npm registry → ${NPM_REGISTRY_URL}"
@@ -599,7 +599,7 @@ restore_mirrors() {
     restore_gemrc
 
     # npm
-    local npmrc="$HOME/.npmrc" npmrc_bak="$HOME/.npmrc_clackybak"
+    local npmrc="$HOME/.npmrc" npmrc_bak="$HOME/.npmrc_octobak"
     if [ -f "$npmrc_bak" ]; then
         mv "$npmrc_bak" "$npmrc"; print_success "~/.npmrc restored from backup"
     elif [ -f "$npmrc" ]; then
@@ -691,7 +691,7 @@ EOF
 }
 
 # --------------------------------------------------------------------------
-# gem install openclacky
+# gem install octo
 # --------------------------------------------------------------------------
 install_via_gem() {
     print_step "Installing via RubyGems..."
@@ -702,7 +702,7 @@ install_via_gem() {
     version_ge "$ver" "3.1.0" || { print_error "Ruby $ver too old (>= 3.1.0 required)"; return 1; }
 
     print_info "Installing ${DISPLAY_NAME}..."
-    if gem install openclacky --no-document; then
+    if gem install octo --no-document; then
         print_success "${DISPLAY_NAME} installed!"
         install_chrome_devtools_mcp
         return 0
@@ -753,7 +753,7 @@ parse_args() {
             --restore-mirrors) RESTORE_MIRRORS=true                 ;;
         esac
     done
-    DISPLAY_NAME="${BRAND_NAME:-OpenClacky}"
+    DISPLAY_NAME="${BRAND_NAME:-Octo}"
 }
 
 # --------------------------------------------------------------------------
@@ -761,8 +761,8 @@ parse_args() {
 # --------------------------------------------------------------------------
 setup_brand() {
     [ -z "$BRAND_NAME" ] && return 0
-    local brand_file="$HOME/.clacky/brand.yml"
-    mkdir -p "$HOME/.clacky"
+    local brand_file="$HOME/.octo/brand.yml"
+    mkdir -p "$HOME/.octo"
     print_step "Configuring brand: $BRAND_NAME"
     cat > "$brand_file" <<YAML
 product_name: "${BRAND_NAME}"
@@ -776,7 +776,7 @@ YAML
         local wrapper="$bin_dir/$BRAND_COMMAND"
         cat > "$wrapper" <<WRAPPER
 #!/bin/sh
-exec openclacky "\$@"
+exec octo "\$@"
 WRAPPER
         chmod +x "$wrapper"
         print_success "Wrapper installed: $wrapper"
@@ -791,7 +791,7 @@ WRAPPER
 # Post-install info
 # --------------------------------------------------------------------------
 show_post_install_info() {
-    local cmd="${BRAND_COMMAND:-openclacky}"
+    local cmd="${BRAND_COMMAND:-octo}"
     echo ""
     echo -e "  ${GREEN}${DISPLAY_NAME} installed successfully!${NC}"
     echo ""
@@ -823,7 +823,7 @@ main() {
     detect_network_region
     configure_cn_mirrors
 
-    assert_supported_os "Please install Ruby manually and run: gem install openclacky"
+    assert_supported_os "Please install Ruby manually and run: gem install octo"
 
     if [ "$OS" = "macOS" ]; then
         install_macos_dependencies || { print_error "Failed to install dependencies"; exit 1; }

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Channel is a feature that bridges Clacky's Server Sessions to IM platforms
+Channel is a feature that bridges Octo's Server Sessions to IM platforms
 (Feishu, WeCom, DingTalk, etc.). It reuses the existing Agent + SessionRegistry
 infrastructure — the Agent knows nothing about IM; the Channel layer is purely
 a transport adapter.
@@ -57,7 +57,7 @@ SessionRegistry    ChannelUIController
 ## File Structure
 
 ```
-lib/clacky/channel/
+lib/octo/channel/
 ├── adapters/
 │   ├── base.rb                  # Adapter abstract base + registry
 │   ├── feishu/
@@ -72,7 +72,7 @@ lib/clacky/channel/
 ├── channel_binding.rb           # (platform, user_id) → session_id mapping
 ├── channel_ui_controller.rb     # UIInterface impl — pushes events to IM
 └── channel_manager.rb           # Lifecycle: start/stop adapters, route messages
-lib/clacky/channel.rb            # Top-level require entry point
+lib/octo/channel.rb            # Top-level require entry point
 ```
 
 ---
@@ -138,7 +138,7 @@ end
 
 ## ChannelBinding
 
-Maps `(platform, user_id)` → `session_id`. Persisted to `~/.clacky/channel_bindings.yml`.
+Maps `(platform, user_id)` → `session_id`. Persisted to `~/.octo/channel_bindings.yml`.
 
 Binding modes (configurable per platform):
 
@@ -167,7 +167,7 @@ Implements `UIInterface`. Key behaviours:
 Main thread  (WEBrick server.start — blocks)
 ├── WEBrick request threads    (existing)
 ├── Agent task threads         (existing, per task)
-├── Scheduler thread           (existing, clacky-scheduler)
+├── Scheduler thread           (existing, octo-scheduler)
 └── ChannelManager
     ├── feishu-adapter thread  (WSClient read loop, constant)
     │   └── feishu-ping thread (heartbeat, 90s)
@@ -182,7 +182,7 @@ on demand (same as Web UI path) and exit when done.
 
 ## Configuration
 
-Channel credentials live in `~/.clacky/channels.yml` (managed by `ChannelConfig`
+Channel credentials live in `~/.octo/channels.yml` (managed by `ChannelConfig`
 which already exists in main branch):
 
 ```yaml
@@ -210,7 +210,7 @@ channels:
 @channel_manager = ChannelManager.new(
   session_registry: @registry,
   session_builder:  method(:build_session),
-  channel_config:   Clacky::ChannelConfig.load,
+  channel_config:   Octo::ChannelConfig.load,
   agent_config:     @agent_config
 )
 
@@ -227,8 +227,8 @@ mirroring `Scheduler#start` behaviour.
 
 DingTalk also supports a WebSocket Stream mode. Adding it means:
 
-1. `lib/clacky/channel/adapters/dingtalk/adapter.rb` inheriting `Base`
-2. `lib/clacky/channel/adapters/dingtalk/ws_client.rb`
+1. `lib/octo/channel/adapters/dingtalk/adapter.rb` inheriting `Base`
+2. `lib/octo/channel/adapters/dingtalk/ws_client.rb`
 3. Register: `Adapters.register(:dingtalk, Adapter)`
 4. Add credentials to `ChannelConfig`
 

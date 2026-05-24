@@ -43,7 +43,7 @@ Each task in the history contains:
 
 **Complete AFTER-State Snapshots:**
 - After each successful task execution, all modified files are saved
-- Storage location: `~/.clacky/snapshots/{session_id}/task-{id}/`
+- Storage location: `~/.octo/snapshots/{session_id}/task-{id}/`
 - Each file is stored with its full relative path from working directory
 - Only files modified during that task are snapshotted
 

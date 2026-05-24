@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "clacky/ui2/components/input_area"
+require "octo/ui2/components/input_area"
 
-RSpec.describe Clacky::UI2::Components::InputArea do
+RSpec.describe Octo::UI2::Components::InputArea do
   let(:input_area) { described_class.new(row: 20) }
 
   describe "#insert_char" do

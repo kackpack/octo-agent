@@ -1,5 +1,5 @@
 #!/bin/bash
-# release.sh — openclacky gem release automation
+# release.sh — octo gem release automation
 #
 # Usage:
 #   bash release.sh <version> [--prerelease] [--update-latest]
@@ -59,11 +59,11 @@ done
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || die "Not inside a git repository"
 cd "$REPO_ROOT"
 
-VERSION_FILE="lib/clacky/version.rb"
-GEMSPEC="openclacky.gemspec"
+VERSION_FILE="lib/octo/version.rb"
+GEMSPEC="octo.gemspec"
 CHANGELOG="CHANGELOG.md"
-GEM_FILE="openclacky-${VERSION}.gem"
-OSS_BUCKET="cos://clackyai-1258723534"
+GEM_FILE="octo-${VERSION}.gem"
+OSS_BUCKET="cos://octoai-1258723534"
 
 [[ -f "$VERSION_FILE" ]] || die "Version file not found: $VERSION_FILE"
 [[ -f "$GEMSPEC" ]]      || die "Gemspec not found: $GEMSPEC"
@@ -237,18 +237,18 @@ success "GitHub Release created"
 # ════════════════════════════════════════════════════════════════════════
 step 11 "Syncing to Tencent Cloud OSS"
 
-run coscli cp "$GEM_FILE" "${OSS_BUCKET}/openclacky/${GEM_FILE}"
+run coscli cp "$GEM_FILE" "${OSS_BUCKET}/octo/${GEM_FILE}"
 success "Uploaded ${GEM_FILE} to OSS"
 
 if [[ "$UPDATE_LATEST" == true ]]; then
     if [[ "$DRY_RUN" != true ]]; then
         echo "${VERSION}" > /tmp/latest.txt
     fi
-    run coscli cp /tmp/latest.txt "${OSS_BUCKET}/openclacky/latest.txt"
+    run coscli cp /tmp/latest.txt "${OSS_BUCKET}/octo/latest.txt"
     success "Updated latest.txt → ${VERSION}"
 
     if [[ "$DRY_RUN" != true ]]; then
-        VERIFY=$(curl -fsSL https://oss.1024code.com/openclacky/latest.txt 2>/dev/null || echo "FAILED")
+        VERIFY=$(curl -fsSL https://oss.1024code.com/octo/latest.txt 2>/dev/null || echo "FAILED")
         if [[ "$VERIFY" == "$VERSION" ]]; then
             success "Verified latest.txt = ${VERSION}"
         else
@@ -269,7 +269,7 @@ run bash scripts/build/build.sh
 if [[ "$DRY_RUN" != true ]]; then
     for script in scripts/*.sh scripts/*.ps1; do
         [[ -f "$script" ]] || continue
-        coscli cp "$script" "${OSS_BUCKET}/clacky-ai/openclacky/main/scripts/$(basename "$script")"
+        coscli cp "$script" "${OSS_BUCKET}/octo-ai/octo/main/scripts/$(basename "$script")"
         success "Uploaded $(basename "$script")"
     done
 else
@@ -296,9 +296,9 @@ echo -e "║   ${GREEN}🎉  v${VERSION} released successfully!${NC}            
 echo "║                                                           ║"
 echo "╠═══════════════════════════════════════════════════════════╣"
 echo "║                                                           ║"
-echo "║  📦 RubyGems:  rubygems.org/gems/openclacky              ║"
-echo "║  🏷️  GitHub:    github.com/clacky-ai/openclacky/releases  ║"
-echo "║  ☁️  OSS CDN:   oss.1024code.com/openclacky/              ║"
+echo "║  📦 RubyGems:  rubygems.org/gems/octo              ║"
+echo "║  🏷️  GitHub:    github.com/octo-ai/octo/releases  ║"
+echo "║  ☁️  OSS CDN:   oss.1024code.com/octo/              ║"
 echo "║                                                           ║"
 echo "╚═══════════════════════════════════════════════════════════╝"
 echo ""

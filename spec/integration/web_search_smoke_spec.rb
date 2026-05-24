@@ -13,7 +13,7 @@
 # and the corresponding parser needs to be updated + fixture refreshed.
 
 RSpec.describe "WebSearch smoke tests", :smoke do
-  let(:tool) { Clacky::Tools::WebSearch.new }
+  let(:tool) { Octo::Tools::WebSearch.new }
   let(:query) { "ruby programming language" }
 
   shared_examples "live search provider" do |provider, required: true|

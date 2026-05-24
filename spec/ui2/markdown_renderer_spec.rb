@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "clacky/ui2/markdown_renderer"
+require "octo/ui2/markdown_renderer"
 
-RSpec.describe Clacky::UI2::MarkdownRenderer do
+RSpec.describe Octo::UI2::MarkdownRenderer do
   describe ".render" do
     it "returns content unchanged when nil or empty" do
       expect(described_class.render(nil)).to be_nil

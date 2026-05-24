@@ -1,9 +1,9 @@
-# OpenClacky
+# Octo
 
-[![Build](https://img.shields.io/github/actions/workflow/status/clacky-ai/openclacky/main.yml?label=build&style=flat-square)](https://github.com/clacky-ai/openclacky/actions)
-[![Release](https://img.shields.io/gem/v/openclacky?label=release&style=flat-square&color=blue)](https://rubygems.org/gems/openclacky)
+[![Build](https://img.shields.io/github/actions/workflow/status/octo-ai/octo/main.yml?label=build&style=flat-square)](https://github.com/octo-ai/octo/actions)
+[![Release](https://img.shields.io/gem/v/octo?label=release&style=flat-square&color=blue)](https://rubygems.org/gems/octo)
 [![Ruby](https://img.shields.io/badge/ruby-%3E%3D%203.1.0-red?style=flat-square)](https://www.ruby-lang.org)
-[![Downloads](https://img.shields.io/gem/dt/openclacky?label=downloads&style=flat-square&color=brightgreen)](https://rubygems.org/gems/openclacky)
+[![Downloads](https://img.shields.io/gem/dt/octo?label=downloads&style=flat-square&color=brightgreen)](https://rubygems.org/gems/octo)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)](LICENSE.txt)
 
 <p align="center">
@@ -14,17 +14,17 @@
 
 **The most Token-efficient open-source AI Agent.**
 
-OpenClacky matches Claude Code on capability at comparable cost, and saves significantly against other open-source agents (~50% vs OpenClaw, ~3× cheaper than Hermes). 100% open source (MIT), BYOK with any OpenAI-compatible model, built on two years of Agentic R&D and harness engineering.
+Octo matches Claude Code on capability at comparable cost, and saves significantly against other open-source agents (~50% vs OpenClaw, ~3× cheaper than Hermes). 100% open source (MIT), BYOK with any OpenAI-compatible model, built on two years of Agentic R&D and harness engineering.
 
-> Website: https://www.openclacky.com/ · Backed by **MiraclePlus · ZhenFund · Sequoia China · Hillhouse Capital**
+> Website: https://www.octo.com/ · Backed by **MiraclePlus · ZhenFund · Sequoia China · Hillhouse Capital**
 
-## Why OpenClacky?
+## Why Octo?
 
-Same task, how much do you pay? Under comparable agent workloads, OpenClacky saves a large amount of Token spend compared to mainstream alternatives.
+Same task, how much do you pay? Under comparable agent workloads, Octo saves a large amount of Token spend compared to mainstream alternatives.
 
 | Agent | Relative cost | Notes |
 |---|---|---|
-| **OpenClacky** | **~0.8** | 16 tools · ~100% cache hit · subagent routing |
+| **Octo** | **~0.8** | 16 tools · ~100% cache hit · subagent routing |
 | Claude Code | 1.0× (baseline) | World-class harness, closed-source subscription |
 | OpenClaw | ~1.5× | Comparable harness agent |
 | Hermes | ~3× | 52 built-in tools — schema bloat ~3–4× |
@@ -35,7 +35,7 @@ Same task, how much do you pay? Under comparable agent workloads, OpenClacky sav
 
 Core agent capability is roughly on par across the field — the real differentiators are **cost, openness, Skill evolution, and integrations**.
 
-| Feature | Claude Code | OpenClaw | Hermes | **OpenClacky** |
+| Feature | Claude Code | OpenClaw | Hermes | **Octo** |
 |---|:---:|:---:|:---:|:---:|
 | Token cost | 1.0× | ~1.5× | ~3× | **~0.8** |
 | Open source | ❌ Closed | ✅ Open | ✅ Open | ✅ MIT |
@@ -53,7 +53,7 @@ Sessions never restart, double cache markers, **Insert-then-Compress** — the s
 ### 2. Minimal tool set
 Only **16 core tools**. Capabilities are offloaded to the Skill ecosystem via a single `invoke_skill` meta-tool. Tool count is not the metric — task completion rate is.
 
-| OpenClacky | Claude Code | OpenClaw | Hermes |
+| Octo | Claude Code | OpenClaw | Hermes |
 |:--:|:--:|:--:|:--:|
 | **16** | 40+ | 23 | 52 |
 
@@ -79,23 +79,23 @@ Built on **2 years · 3 generations of agentic architecture · 6 core harness en
 
 Double-click to install — environment, dependencies, and Skills all set up automatically.
 
-- **macOS** — [Download `.dmg`](https://oss.1024code.com/openclacky-installer/official/openclacky-installer.dmg) (Apple Silicon / Intel)
-- **Windows** — [Download `.exe`](https://oss.1024code.com/openclacky-installer/official/openclacky-installer.exe) (Windows 10 2004+ / Windows 11)
+- **macOS** — [Download `.dmg`](https://oss.1024code.com/octo-installer/official/octo-installer.dmg) (Apple Silicon / Intel)
+- **Windows** — [Download `.exe`](https://oss.1024code.com/octo-installer/official/octo-installer.exe) (Windows 10 2004+ / Windows 11)
 
-More options: https://www.openclacky.com/
+More options: https://www.octo.com/
 
 ### Command line
 
 One-line install(Mac/Ubuntu):
 
 ```bash
-/bin/bash -c "$(curl -sSL https://raw.githubusercontent.com/clacky-ai/openclacky/main/scripts/install.sh)"
+/bin/bash -c "$(curl -sSL https://raw.githubusercontent.com/octo-ai/octo/main/scripts/install.sh)"
 ```
 
 Windows:
 
 ```bash
-powershell -c "& ([scriptblock]::Create((irm 'https://raw.githubusercontent.com/clacky-ai/openclacky/main/scripts/install.ps1')))"
+powershell -c "& ([scriptblock]::Create((irm 'https://raw.githubusercontent.com/octo-ai/octo/main/scripts/install.ps1')))"
 ```
 
 or using Ruby(3.x/4.x):
@@ -103,10 +103,10 @@ or using Ruby(3.x/4.x):
 **Requirements:** Ruby >= 3.1.0
 
 ```bash
-gem install openclacky
+gem install octo
 ```
 
-see more: https://www.openclacky.com/docs/installation
+see more: https://www.octo.com/docs/installation
 
 
 ## Quick Start
@@ -114,13 +114,13 @@ see more: https://www.openclacky.com/docs/installation
 ### Terminal (CLI)
 
 ```bash
-openclacky            # start interactive agent in current directory
+octo            # start interactive agent in current directory
 ```
 
 ### Web UI
 
 ```bash
-openclacky server     # default: http://localhost:7070
+octo server     # default: http://localhost:7070
 ```
 
 Open **http://localhost:7070** for a full chat interface with multi-session support — run coding, copywriting, research sessions in parallel.
@@ -128,14 +128,14 @@ Open **http://localhost:7070** for a full chat interface with multi-session supp
 Options:
 
 ```bash
-openclacky server --port 8080        # custom port
-openclacky server --host 0.0.0.0     # listen on all interfaces (remote access)
+octo server --port 8080        # custom port
+octo server --host 0.0.0.0     # listen on all interfaces (remote access)
 ```
 
 ## Configuration
 
 ```bash
-$ openclacky
+$ octo
 > /config
 ```
 
@@ -145,10 +145,10 @@ Supported out of the box: **Claude (Anthropic) · GPT (OpenAI) · DeepSeek · Ki
 
 ## Coding use case
 
-OpenClacky works as a general AI coding assistant — scaffold full-stack apps, add features, or explore unfamiliar codebases:
+Octo works as a general AI coding assistant — scaffold full-stack apps, add features, or explore unfamiliar codebases:
 
 ```bash
-$ openclacky
+$ octo
 > /new my-app        # scaffold a new project
 > Add user auth with email and password
 > How does the payment module work?
@@ -156,27 +156,27 @@ $ openclacky
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=clacky-ai%2Fopenclacky&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=octo-ai%2Focto&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=clacky-ai/openclacky&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=clacky-ai/openclacky&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=clacky-ai/openclacky&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=octo-ai/octo&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=octo-ai/octo&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=octo-ai/octo&type=date&legend=top-left" />
  </picture>
 </a>
 
 ## Advanced — Creator Program
 
-Already power users are turning their workflows into vertical AI experts on OpenClacky — encrypted distribution, License management, self-set pricing. Legal, healthcare, financial planning, and more.
+Already power users are turning their workflows into vertical AI experts on Octo — encrypted distribution, License management, self-set pricing. Legal, healthcare, financial planning, and more.
 
-Learn more: https://www.openclacky.com/ → Creators
+Learn more: https://www.octo.com/ → Creators
 
 ## Install from Source
 
 ```bash
-git clone https://github.com/clacky-ai/openclacky.git
-cd openclacky
+git clone https://github.com/octo-ai/octo.git
+cd octo
 bundle install
-bin/clacky
+bin/octo
 ```
 
 ## Trust & Credibility
@@ -188,15 +188,15 @@ bin/clacky
 
 ## Contributors
 
-Every line of code, bug report, and thoughtful review matters. Thank you for making OpenClacky better.
+Every line of code, bug report, and thoughtful review matters. Thank you for making Octo better.
 
-<a href="https://github.com/clacky-ai/openclacky/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=clacky-ai/openclacky" />
+<a href="https://github.com/octo-ai/octo/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=octo-ai/octo" />
 </a>
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/clacky-ai/openclacky. Contributors are expected to adhere to the [code of conduct](https://github.com/clacky-ai/openclacky/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/octo-ai/octo. Contributors are expected to adhere to the [code of conduct](https://github.com/octo-ai/octo/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 

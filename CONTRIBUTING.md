@@ -1,4 +1,4 @@
-# Contributing to OpenClacky
+# Contributing to Octo
 
 Thanks for taking the time to contribute. Every PR will be reviewed. We evaluate
 each contribution along three dimensions:
@@ -55,9 +55,9 @@ PR description.
 - Keep commits focused; squash noise before requesting review.
 - PR descriptions should briefly state: what, why, and any user-visible impact.
 
-### Built with OpenClacky
+### Built with Octo
 
-- PRs **authored using OpenClacky itself** are prioritized for review and
+- PRs **authored using Octo itself** are prioritized for review and
   merge. Mention it in the PR description if applicable. We dogfood our own
   tool.
 
@@ -71,8 +71,8 @@ PR description.
 ### Style
 
 - Follow the conventions already present in the file you're editing.
-- See each sub-project's `.clackyrules` for project-specific rules
-  (`openclacky/`, `platform/`, `installer/`).
+- See each sub-project's `.octorules` for project-specific rules
+  (`octo/`, `platform/`, `installer/`).
 
 ---
 

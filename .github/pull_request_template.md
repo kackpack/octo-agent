@@ -38,7 +38,7 @@ Please confirm before requesting review. See [CONTRIBUTING.md](../CONTRIBUTING.m
 
 ### Bonus
 
-- [ ] This PR was authored using OpenClacky itself
+- [ ] This PR was authored using Octo itself
 
 ---
 

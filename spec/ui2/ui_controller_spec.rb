@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Clacky::UI2::UIController do
+RSpec.describe Octo::UI2::UIController do
   describe '#filter_thinking_tags' do
     let(:controller) { described_class.new }
 

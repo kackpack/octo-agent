@@ -77,7 +77,7 @@
       "",
       "这个重复调用 `calculateTotal` 的问题，就像两个厨师都要先切菜才能做菜——切菜这个动作被重复了两次。最干净的解法就是把\"先算小计\"这个步骤封装成一个私有方法，或者更简单地，让两个方法都直接调用 `calculateTotal`。\n\n不过，最简洁的方式其实是：把 `calculateTotal` 的调用保留在每个方法里，因为这两个方法本身就是独立的计算逻辑，它们各自需要小计值。真正的\"重复\"在于它们都显式地创建了一个局部变量来存储结果。\n\n最干净的 refactor 是去掉多余的局部变量，直接链式调用：",
       "",
-      "搞定！改动就像把\"先拿杯子再倒水\"简化成\"直接倒水\"——去掉了两个方法里多余的中间变量。\n\n**改动内容：**\n- `calculateTotalWithTax` 和 `applyDiscount` 都不再先把 `calculateTotal` 的结果存到局部变量里，而是直接链式调用。\n\n这样代码更简洁，行为完全一致，也没有过度设计。测试通过 ✅\n\n[lib/order_calculator.rb](file:///var/folders/s2/7t66qxl551q8cr_062k3tw5w0000gn/T/clacky_benchmark_baseline_refactoring_20110_1778492494/lib/order_calculator.rb)"
+      "搞定！改动就像把\"先拿杯子再倒水\"简化成\"直接倒水\"——去掉了两个方法里多余的中间变量。\n\n**改动内容：**\n- `calculateTotalWithTax` 和 `applyDiscount` 都不再先把 `calculateTotal` 的结果存到局部变量里，而是直接链式调用。\n\n这样代码更简洁，行为完全一致，也没有过度设计。测试通过 ✅\n\n[lib/order_calculator.rb](file:///var/folders/s2/7t66qxl551q8cr_062k3tw5w0000gn/T/octo_benchmark_baseline_refactoring_20110_1778492494/lib/order_calculator.rb)"
     ],
     "total_assistant_chars": 598
   },

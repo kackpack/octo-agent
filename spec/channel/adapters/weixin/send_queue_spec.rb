@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "clacky/server/channel/adapters/weixin/adapter"
+require "octo/server/channel/adapters/weixin/adapter"
 
-RSpec.describe Clacky::Channel::Adapters::Weixin::SendQueue do
-  let(:api_client) { instance_double("Clacky::Channel::Adapters::Weixin::ApiClient") }
+RSpec.describe Octo::Channel::Adapters::Weixin::SendQueue do
+  let(:api_client) { instance_double("Octo::Channel::Adapters::Weixin::ApiClient") }
   let(:logger) do
     instance_double("Logger").tap do |l|
       allow(l).to receive(:error)
@@ -17,10 +17,10 @@ RSpec.describe Clacky::Channel::Adapters::Weixin::SendQueue do
   # specs use `instance_variable_get(:@flusher)` to stop the thread first
   # and drive `drain_buffers` synchronously via `send(:drain_buffers)`.
   before do
-    stub_const("Clacky::Channel::Adapters::Weixin::SendQueue::FLUSH_CHAR_THRESHOLD", 20)
-    stub_const("Clacky::Channel::Adapters::Weixin::SendQueue::FLUSH_INTERVAL", 0.05)
-    stub_const("Clacky::Channel::Adapters::Weixin::SendQueue::MIN_SEND_INTERVAL", 0.0)
-    stub_const("Clacky::Channel::Adapters::Weixin::SendQueue::RETRY_BACKOFFS", [0.0, 0.0, 0.0])
+    stub_const("Octo::Channel::Adapters::Weixin::SendQueue::FLUSH_CHAR_THRESHOLD", 20)
+    stub_const("Octo::Channel::Adapters::Weixin::SendQueue::FLUSH_INTERVAL", 0.05)
+    stub_const("Octo::Channel::Adapters::Weixin::SendQueue::MIN_SEND_INTERVAL", 0.0)
+    stub_const("Octo::Channel::Adapters::Weixin::SendQueue::RETRY_BACKOFFS", [0.0, 0.0, 0.0])
   end
 
   # Build a queue and immediately stop its background thread so we can drive
@@ -195,7 +195,7 @@ RSpec.describe Clacky::Channel::Adapters::Weixin::SendQueue do
 
   describe "#throttle (private)" do
     it "spaces consecutive sends by at least MIN_SEND_INTERVAL" do
-      stub_const("Clacky::Channel::Adapters::Weixin::SendQueue::MIN_SEND_INTERVAL", 0.1)
+      stub_const("Octo::Channel::Adapters::Weixin::SendQueue::MIN_SEND_INTERVAL", 0.1)
       q = build_quiesced_queue
 
       t0 = Time.now
@@ -211,7 +211,7 @@ RSpec.describe Clacky::Channel::Adapters::Weixin::SendQueue do
   end
 
   describe "#send_with_retry (private)" do
-    let(:api_error_class) { Clacky::Channel::Adapters::Weixin::ApiClient::ApiError }
+    let(:api_error_class) { Octo::Channel::Adapters::Weixin::ApiClient::ApiError }
 
     it "retries on ret=-2 then succeeds" do
       q = build_quiesced_queue

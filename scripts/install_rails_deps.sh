@@ -139,7 +139,7 @@ CN_RUBY_PRECOMPILED_URL="${CN_CDN_BASE_URL}/ruby/ruby-{version}.{platform}.tar.g
 CN_RUBYGEMS_URL="${CN_ALIYUN_MIRROR}/rubygems/"
 CN_NPM_REGISTRY="https://registry.npmmirror.com"
 CN_NODE_MIRROR_URL="https://cdn.npmmirror.com/binaries/node/"
-CN_GEM_BASE_URL="${CN_CDN_BASE_URL}/openclacky"
+CN_GEM_BASE_URL="${CN_CDN_BASE_URL}/octo"
 CN_GEM_LATEST_URL="${CN_GEM_BASE_URL}/latest.txt"
 
 # Active values (set by detect_network_region)
@@ -357,7 +357,7 @@ configure_homebrew_cn_mirrors() {
     if ! grep -q "HOMEBREW_BOTTLE_DOMAIN" "$SHELL_RC" 2>/dev/null; then
         {
             echo ""
-            echo "# Homebrew CN mirrors (added by openclacky installer)"
+            echo "# Homebrew CN mirrors (added by octo installer)"
             echo "export HOMEBREW_INSTALL_FROM_API=1"
             echo "export HOMEBREW_API_DOMAIN=\"${CN_HOMEBREW_API_DOMAIN}\""
             echo "export HOMEBREW_BREW_GIT_REMOTE=\"${CN_HOMEBREW_BREW_GIT_REMOTE}\""
@@ -375,7 +375,7 @@ configure_homebrew_cn_mirrors() {
 # --------------------------------------------------------------------------
 restore_homebrew_cn_mirrors() {
     if [ -n "$SHELL_RC" ] && [ -f "$SHELL_RC" ] && grep -q "HOMEBREW_BOTTLE_DOMAIN" "$SHELL_RC" 2>/dev/null; then
-        sed -i.bak '/# Homebrew CN mirrors (added by openclacky installer)/d' "$SHELL_RC"
+        sed -i.bak '/# Homebrew CN mirrors (added by octo installer)/d' "$SHELL_RC"
         sed -i.bak '/HOMEBREW_INSTALL_FROM_API/d' "$SHELL_RC"
         sed -i.bak '/HOMEBREW_API_DOMAIN/d' "$SHELL_RC"
         sed -i.bak '/HOMEBREW_BREW_GIT_REMOTE/d' "$SHELL_RC"
@@ -546,7 +546,7 @@ configure_gem_source() {
         if grep -q "${CN_RUBYGEMS_URL}" "$gemrc" 2>/dev/null; then
             print_success "gem source already → ${CN_RUBYGEMS_URL}"
         else
-            [ -f "$gemrc" ] && mv "$gemrc" "$HOME/.gemrc_clackybak"
+            [ -f "$gemrc" ] && mv "$gemrc" "$HOME/.gemrc_octobak"
             cat > "$gemrc" <<GEMRC
 :sources:
   - ${CN_RUBYGEMS_URL}
@@ -555,8 +555,8 @@ GEMRC
         fi
     else
         if [ -f "$gemrc" ] && grep -q "${CN_RUBYGEMS_URL}" "$gemrc" 2>/dev/null; then
-            if [ -f "$HOME/.gemrc_clackybak" ]; then
-                mv "$HOME/.gemrc_clackybak" "$gemrc"
+            if [ -f "$HOME/.gemrc_octobak" ]; then
+                mv "$HOME/.gemrc_octobak" "$gemrc"
                 print_info "gem source restored from backup"
             else
                 rm "$gemrc"
@@ -568,7 +568,7 @@ GEMRC
 
 restore_gemrc() {
     local gemrc="$HOME/.gemrc"
-    local gemrc_bak="$HOME/.gemrc_clackybak"
+    local gemrc_bak="$HOME/.gemrc_octobak"
     if [ -f "$gemrc_bak" ]; then
         mv "$gemrc_bak" "$gemrc"
         print_success "~/.gemrc restored from backup"
@@ -598,7 +598,7 @@ setup_gem_home() {
     if [ -n "$SHELL_RC" ] && ! grep -q "GEM_HOME" "$SHELL_RC" 2>/dev/null; then
         {
             echo ""
-            echo "# Ruby user gem dir (added by openclacky installer)"
+            echo "# Ruby user gem dir (added by octo installer)"
             echo "export GEM_HOME=\"\$HOME/.gem/ruby/${ruby_api}\""
             echo "export GEM_PATH=\"\$HOME/.gem/ruby/${ruby_api}\""
             echo "export PATH=\"\$HOME/.gem/ruby/${ruby_api}/bin:\$PATH\""
@@ -613,7 +613,7 @@ restore_gem_home() {
     # Remove the block written by setup_gem_home (comment + 3 export lines)
     local tmp
     tmp=$(mktemp)
-    grep -v "# Ruby user gem dir (added by openclacky installer)" "$SHELL_RC" \
+    grep -v "# Ruby user gem dir (added by octo installer)" "$SHELL_RC" \
         | grep -v "export GEM_HOME=" \
         | grep -v "export GEM_PATH=" \
         | grep -v "/.gem/ruby/" \
@@ -642,10 +642,10 @@ install_ruby() {
     # Configure gem source for CN users
     configure_gem_source
 
-    # Reinstall openclacky in the new Ruby environment
-    "${MISE_BIN:-mise}" exec -- gem install openclacky --no-document \
-        && print_success "openclacky reinstalled" \
-        || print_warning "Could not reinstall openclacky — run manually: gem install openclacky --no-document"
+    # Reinstall octo in the new Ruby environment
+    "${MISE_BIN:-mise}" exec -- gem install octo --no-document \
+        && print_success "octo reinstalled" \
+        || print_warning "Could not reinstall octo — run manually: gem install octo --no-document"
 }
 
 # --------------------------------------------------------------------------
@@ -705,7 +705,7 @@ main() {
         if [ "$USE_CN_MIRRORS" = true ]; then
             install_cmd='/bin/bash -c "$(curl -sSL https://oss.1024code.com/scripts/install_full.sh)"'
         else
-            install_cmd='/bin/bash -c "$(curl -sSL https://raw.githubusercontent.com/clacky-ai/openclacky/main/scripts/install_full.sh)"'
+            install_cmd='/bin/bash -c "$(curl -sSL https://raw.githubusercontent.com/octo-ai/octo/main/scripts/install_full.sh)"'
         fi
         echo ""
         print_error "Homebrew is not installed — it is required to continue."
@@ -724,7 +724,7 @@ main() {
     fi
 
     # Run system deps script if available
-    local sys_deps="$HOME/.clacky/scripts/install_system_deps.sh"
+    local sys_deps="$HOME/.octo/scripts/install_system_deps.sh"
     [ -f "$sys_deps" ] && { bash "$sys_deps" || print_warning "System deps install had warnings — continuing"; }
 
     case "$INSTALL_TARGET" in

@@ -19,7 +19,7 @@ configure_gem_source() {
         if grep -q "${CN_RUBYGEMS_URL}" "$gemrc" 2>/dev/null; then
             print_success "gem source already → ${CN_RUBYGEMS_URL}"
         else
-            [ -f "$gemrc" ] && mv "$gemrc" "$HOME/.gemrc_clackybak"
+            [ -f "$gemrc" ] && mv "$gemrc" "$HOME/.gemrc_octobak"
             cat > "$gemrc" <<GEMRC
 :sources:
   - ${CN_RUBYGEMS_URL}
@@ -28,8 +28,8 @@ GEMRC
         fi
     else
         if [ -f "$gemrc" ] && grep -q "${CN_RUBYGEMS_URL}" "$gemrc" 2>/dev/null; then
-            if [ -f "$HOME/.gemrc_clackybak" ]; then
-                mv "$HOME/.gemrc_clackybak" "$gemrc"
+            if [ -f "$HOME/.gemrc_octobak" ]; then
+                mv "$HOME/.gemrc_octobak" "$gemrc"
                 print_info "gem source restored from backup"
             else
                 rm "$gemrc"
@@ -41,7 +41,7 @@ GEMRC
 
 restore_gemrc() {
     local gemrc="$HOME/.gemrc"
-    local gemrc_bak="$HOME/.gemrc_clackybak"
+    local gemrc_bak="$HOME/.gemrc_octobak"
     if [ -f "$gemrc_bak" ]; then
         mv "$gemrc_bak" "$gemrc"
         print_success "~/.gemrc restored from backup"
@@ -71,7 +71,7 @@ setup_gem_home() {
     if [ -n "$SHELL_RC" ] && ! grep -q "GEM_HOME" "$SHELL_RC" 2>/dev/null; then
         {
             echo ""
-            echo "# Ruby user gem dir (added by openclacky installer)"
+            echo "# Ruby user gem dir (added by octo installer)"
             echo "export GEM_HOME=\"\$HOME/.gem/ruby/${ruby_api}\""
             echo "export GEM_PATH=\"\$HOME/.gem/ruby/${ruby_api}\""
             echo "export PATH=\"\$HOME/.gem/ruby/${ruby_api}/bin:\$PATH\""
@@ -86,7 +86,7 @@ restore_gem_home() {
     # Remove the block written by setup_gem_home (comment + 3 export lines)
     local tmp
     tmp=$(mktemp)
-    grep -v "# Ruby user gem dir (added by openclacky installer)" "$SHELL_RC" \
+    grep -v "# Ruby user gem dir (added by octo installer)" "$SHELL_RC" \
         | grep -v "export GEM_HOME=" \
         | grep -v "export GEM_PATH=" \
         | grep -v "/.gem/ruby/" \

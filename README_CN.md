@@ -1,26 +1,26 @@
-# OpenClacky
+# Octo
 
-[![Build](https://img.shields.io/github/actions/workflow/status/clacky-ai/openclacky/main.yml?label=build&style=flat-square)](https://github.com/clacky-ai/openclacky/actions)
-[![Release](https://img.shields.io/gem/v/openclacky?label=release&style=flat-square&color=blue)](https://rubygems.org/gems/openclacky)
+[![Build](https://img.shields.io/github/actions/workflow/status/octo-ai/octo/main.yml?label=build&style=flat-square)](https://github.com/octo-ai/octo/actions)
+[![Release](https://img.shields.io/gem/v/octo?label=release&style=flat-square&color=blue)](https://rubygems.org/gems/octo)
 [![Ruby](https://img.shields.io/badge/ruby-%3E%3D%203.1.0-red?style=flat-square)](https://www.ruby-lang.org)
-[![Downloads](https://img.shields.io/gem/dt/openclacky?label=downloads&style=flat-square&color=brightgreen)](https://rubygems.org/gems/openclacky)
+[![Downloads](https://img.shields.io/gem/dt/octo?label=downloads&style=flat-square&color=brightgreen)](https://rubygems.org/gems/octo)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)](LICENSE.txt)
 
 > 想贡献代码？提 PR 前请先读 **[CONTRIBUTING.md](./CONTRIBUTING.md)**。
 
 **最省 Token 的开源 AI Agent。**
 
-OpenClacky 在任务能力上对齐 Claude Code，成本相当，同时相比其他开源 Agent 有显著优势（约节省 50% vs OpenClaw，约便宜 3× vs Hermes）。100% 开源（MIT），支持 BYOK 接入任意 OpenAI 兼容模型，背后是两年 Agentic 研发与 Harness 工程积累。
+Octo 在任务能力上对齐 Claude Code，成本相当，同时相比其他开源 Agent 有显著优势（约节省 50% vs OpenClaw，约便宜 3× vs Hermes）。100% 开源（MIT），支持 BYOK 接入任意 OpenAI 兼容模型，背后是两年 Agentic 研发与 Harness 工程积累。
 
-> 官网：https://www.openclacky.com/ · 投资方：**奇绩创坛 · 真格基金 · 红杉中国 · 高瓴资本**
+> 官网：https://www.octo.com/ · 投资方：**奇绩创坛 · 真格基金 · 红杉中国 · 高瓴资本**
 
-## 为什么选 OpenClacky？
+## 为什么选 Octo？
 
-同一个任务，你要花多少钱？在可比的 Agent 工作负载下，OpenClacky 相比主流方案节省了大量 Token 费用。
+同一个任务，你要花多少钱？在可比的 Agent 工作负载下，Octo 相比主流方案节省了大量 Token 费用。
 
 | Agent | 相对成本 | 备注 |
 |---|---|---|
-| **OpenClacky** | **~0.8×** | 16 个工具 · 近 100% 缓存命中 · 子 Agent 路由 |
+| **Octo** | **~0.8×** | 16 个工具 · 近 100% 缓存命中 · 子 Agent 路由 |
 | Claude Code | 1.0×（基准） | 世界级 Harness，闭源订阅制 |
 | OpenClaw | ~1.5× | 能力对标的 Harness Agent |
 | Hermes | ~3× | 52 个内置工具，Schema 体积膨胀 ~3–4× |
@@ -31,7 +31,7 @@ OpenClacky 在任务能力上对齐 Claude Code，成本相当，同时相比其
 
 核心 Agent 能力各家大致对齐，真正的差异在于**成本、开放性、Skill 进化能力和集成支持**。
 
-| 功能 | Claude Code | OpenClaw | Hermes | **OpenClacky** |
+| 功能 | Claude Code | OpenClaw | Hermes | **Octo** |
 |---|:---:|:---:|:---:|:---:|
 | Token 成本 | 1.0× | ~1.5× | ~3× | **~0.8×** |
 | 开源 | ❌ 闭源 | ✅ 开源 | ✅ 开源 | ✅ MIT |
@@ -49,7 +49,7 @@ Session 不重启、双缓存标记、**先插入再压缩**——System Prompt 
 ### 2. 极简工具集
 仅 **16 个核心工具**。扩展能力通过一个 `invoke_skill` 元工具交给 Skill 生态承载。工具数量不是指标——任务完成率才是。
 
-| OpenClacky | Claude Code | OpenClaw | Hermes |
+| Octo | Claude Code | OpenClaw | Hermes |
 |:--:|:--:|:--:|:--:|
 | **16** | 40+ | 23 | 52 |
 
@@ -75,23 +75,23 @@ Session 不重启、双缓存标记、**先插入再压缩**——System Prompt 
 
 双击安装，环境、依赖、Skill 全部自动配置好。
 
-- **macOS** — [下载 `.dmg`](https://oss.1024code.com/openclacky-installer/official/openclacky-installer.dmg)（Apple Silicon / Intel）
-- **Windows** — [下载 `.exe`](https://oss.1024code.com/openclacky-installer/official/openclacky-installer.exe)（Windows 10 2004+ / Windows 11）
+- **macOS** — [下载 `.dmg`](https://oss.1024code.com/octo-installer/official/octo-installer.dmg)（Apple Silicon / Intel）
+- **Windows** — [下载 `.exe`](https://oss.1024code.com/octo-installer/official/octo-installer.exe)（Windows 10 2004+ / Windows 11）
 
-更多选项：https://www.openclacky.com/
+更多选项：https://www.octo.com/
 
 ### 命令行安装
 
 一键安装（Mac/Ubuntu）：
 
 ```bash
-/bin/bash -c "$(curl -sSL https://raw.githubusercontent.com/clacky-ai/openclacky/main/scripts/install.sh)"
+/bin/bash -c "$(curl -sSL https://raw.githubusercontent.com/octo-ai/octo/main/scripts/install.sh)"
 ```
 
 Windows：
 
 ```bash
-powershell -c "& ([scriptblock]::Create((irm 'https://raw.githubusercontent.com/clacky-ai/openclacky/main/scripts/install.ps1')))"
+powershell -c "& ([scriptblock]::Create((irm 'https://raw.githubusercontent.com/octo-ai/octo/main/scripts/install.ps1')))"
 ```
 
 或使用 Ruby（3.x/4.x）：
@@ -99,23 +99,23 @@ powershell -c "& ([scriptblock]::Create((irm 'https://raw.githubusercontent.com/
 **环境要求：** Ruby >= 3.1.0
 
 ```bash
-gem install openclacky
+gem install octo
 ```
 
-详见：https://www.openclacky.com/docs/installation
+详见：https://www.octo.com/docs/installation
 
 ## 快速开始
 
 ### 终端（CLI）
 
 ```bash
-openclacky            # 在当前目录启动交互式 Agent
+octo            # 在当前目录启动交互式 Agent
 ```
 
 ### Web UI
 
 ```bash
-openclacky server     # 默认地址：http://localhost:7070
+octo server     # 默认地址：http://localhost:7070
 ```
 
 打开 **http://localhost:7070**，享受完整的聊天界面，支持多 Session 并行——同时跑编码、文案、研究等多个任务。
@@ -123,14 +123,14 @@ openclacky server     # 默认地址：http://localhost:7070
 选项：
 
 ```bash
-openclacky server --port 8080        # 自定义端口
-openclacky server --host 0.0.0.0     # 监听所有接口（支持远程访问）
+octo server --port 8080        # 自定义端口
+octo server --host 0.0.0.0     # 监听所有接口（支持远程访问）
 ```
 
 ## 配置
 
 ```bash
-$ openclacky
+$ octo
 > /config
 ```
 
@@ -140,10 +140,10 @@ $ openclacky
 
 ## 代码开发场景
 
-OpenClacky 是一款通用 AI 编程助手——搭建全栈应用脚手架、添加功能，或快速探索陌生代码库：
+Octo 是一款通用 AI 编程助手——搭建全栈应用脚手架、添加功能，或快速探索陌生代码库：
 
 ```bash
-$ openclacky
+$ octo
 > /new my-app        # 创建新项目脚手架
 > 添加邮箱密码登录功能
 > 支付模块是怎么实现的？
@@ -151,27 +151,27 @@ $ openclacky
 
 ## Star 历史
 
-<a href="https://www.star-history.com/?repos=clacky-ai%2Fopenclacky&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=octo-ai%2Focto&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=clacky-ai/openclacky&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=clacky-ai/openclacky&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=clacky-ai/openclacky&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=octo-ai/octo&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=octo-ai/octo&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=octo-ai/octo&type=date&legend=top-left" />
  </picture>
 </a>
 
 ## 进阶——创作者计划
 
-已有深度用户将自己的工作流打磨成垂直 AI 专家在 OpenClacky 上发布——支持加密分发、License 管理、自定义定价。法律、医疗、财务规划等领域均有落地。
+已有深度用户将自己的工作流打磨成垂直 AI 专家在 Octo 上发布——支持加密分发、License 管理、自定义定价。法律、医疗、财务规划等领域均有落地。
 
-了解更多：https://www.openclacky.com/ → Creators
+了解更多：https://www.octo.com/ → Creators
 
 ## 从源码安装
 
 ```bash
-git clone https://github.com/clacky-ai/openclacky.git
-cd openclacky
+git clone https://github.com/octo-ai/octo.git
+cd octo
 bundle install
-bin/clacky
+bin/octo
 ```
 
 ## 信任与背书
@@ -187,21 +187,21 @@ bin/clacky
 
 近期文章：
 
-- [从 ShowMeBug 到 OpenClacky：我对 AI 时代的 4 次下注](https://mp.weixin.qq.com/s/wTW-IU5Czu-OpJTFh_mwgA)
+- [从 ShowMeBug 到 Octo：我对 AI 时代的 4 次下注](https://mp.weixin.qq.com/s/wTW-IU5Czu-OpJTFh_mwgA)
 - [我把 AI 账单从 30 美金打到 5 美金](https://mp.weixin.qq.com/s/BDhE0y8xbX0ea3vLlV37Ig)
 - [100% Cache 命中的 Harness 怎么设计：一个开源 AI Agent 的 7 个工程决策](https://mp.weixin.qq.com/s/Rc1xk0Qw168D4Y07kkBiGQ)
 
 ## 贡献者
 
-每一行代码、每一个 Bug 报告、每一次认真的 Review，都让 OpenClacky 变得更好。感谢你们！
+每一行代码、每一个 Bug 报告、每一次认真的 Review，都让 Octo 变得更好。感谢你们！
 
-<a href="https://github.com/clacky-ai/openclacky/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=clacky-ai/openclacky" />
+<a href="https://github.com/octo-ai/octo/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=octo-ai/octo" />
 </a>
 
 ## 参与贡献
 
-欢迎在 GitHub 提交 Bug 报告和 Pull Request：https://github.com/clacky-ai/openclacky 。参与贡献者须遵守[行为准则](https://github.com/clacky-ai/openclacky/blob/main/CODE_OF_CONDUCT.md)。
+欢迎在 GitHub 提交 Bug 报告和 Pull Request：https://github.com/octo-ai/octo 。参与贡献者须遵守[行为准则](https://github.com/octo-ai/octo/blob/main/CODE_OF_CONDUCT.md)。
 
 ## 许可证
 

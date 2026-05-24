@@ -10,13 +10,13 @@ require "tmpdir"
 
 project_root = File.expand_path("..", __dir__)
 $LOAD_PATH.unshift File.join(project_root, "lib")
-require "clacky"
+require "octo"
 
 class BenchmarkRunner
   PROMPT_FILES = {
-    base: "lib/clacky/default_agents/base_prompt.md",
-    coding: "lib/clacky/default_agents/coding/system_prompt.md",
-    general: "lib/clacky/default_agents/general/system_prompt.md"
+    base: "lib/octo/default_agents/base_prompt.md",
+    coding: "lib/octo/default_agents/coding/system_prompt.md",
+    general: "lib/octo/default_agents/general/system_prompt.md"
   }.freeze
 
   FIXTURE_DIR = File.expand_path("fixtures/sample_project", __dir__)
@@ -69,7 +69,7 @@ class BenchmarkRunner
 
   def run_baseline
     puts "=" * 70
-    puts "OpenClacky System Prompt Benchmark - BASELINE"
+    puts "Octo System Prompt Benchmark - BASELINE"
     puts "=" * 70
     puts "Project: #{@project_root}"
     puts "Model: #{agent_config.model_name}"
@@ -97,7 +97,7 @@ class BenchmarkRunner
 
   def run_treatment
     puts "=" * 70
-    puts "OpenClacky System Prompt Benchmark - TREATMENT"
+    puts "Octo System Prompt Benchmark - TREATMENT"
     puts "=" * 70
     puts "Project: #{@project_root}"
     puts "Model: #{agent_config.model_name}"
@@ -155,7 +155,7 @@ class BenchmarkRunner
   private
 
   def agent_config
-    @agent_config ||= Clacky::AgentConfig.load
+    @agent_config ||= Octo::AgentConfig.load
   end
 
   def read_current_prompts
@@ -207,7 +207,7 @@ class BenchmarkRunner
   end
 
   def run_task(task, variant)
-    tmp_dir = File.join(Dir.tmpdir, "clacky_benchmark_#{variant}_#{task[:name]}_#{Process.pid}_#{Time.now.to_i}")
+    tmp_dir = File.join(Dir.tmpdir, "octo_benchmark_#{variant}_#{task[:name]}_#{Process.pid}_#{Time.now.to_i}")
     FileUtils.cp_r(FIXTURE_DIR, tmp_dir)
 
     # Ensure tmp_dir is a git repo (cp_r preserves .git)
@@ -219,19 +219,19 @@ class BenchmarkRunner
     config = agent_config.dup
     config.permission_mode = :auto_approve
 
-    client = Clacky::Client.new(
+    client = Octo::Client.new(
       config.api_key,
       base_url: config.base_url,
       model: config.model_name,
       anthropic_format: config.anthropic_format?
     )
 
-    agent = Clacky::Agent.new(
+    agent = Octo::Agent.new(
       client, config,
       working_dir: tmp_dir,
       ui: BenchmarkUI.new,
       profile: task[:agent_profile],
-      session_id: Clacky::SessionManager.generate_id,
+      session_id: Octo::SessionManager.generate_id,
       source: :manual
     )
 

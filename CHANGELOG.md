@@ -88,12 +88,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2026-05-15
 
 ### Added
-- **DingTalk channel adapter.** New IM channel adapter connects openclacky to DingTalk via Stream Mode WebSocket. Includes DingTalk API client for text/markdown messages, Device Flow QR setup script, and full Web UI integration with channel config, HTTP server routes, and i18n strings. (#112)
+- **DingTalk channel adapter.** New IM channel adapter connects octo to DingTalk via Stream Mode WebSocket. Includes DingTalk API client for text/markdown messages, Device Flow QR setup script, and full Web UI integration with channel config, HTTP server routes, and i18n strings. (#112)
 - **Feishu channel-manager skill setup & onboard improvements.** Channel-manager now includes a dedicated Feishu skills installation flow (`install_feishu_skills.rb`) and updated setup instructions. Skill installation is serialized for reliability. (#122)
 - **Custom datepicker component with i18n support.** New reusable datepicker component with CSS variable theming and full English/Chinese localization, replacing browser-native date inputs. (#119)
 - **Rename sessions via modal dialog.** Session rename now uses a proper modal dialog with i18n support instead of inline editing, for a cleaner UX. (#113)
 - **Channel enable/disable toggle.** Configured channels can now be individually enabled or disabled from the Channels page without removing credentials. Distinguishes "disabled" from "not configured" in badge and hint text. (#108)
-- **Provider promo hint for OpenClacky.** When OpenClacky is selected as provider, a contextual promo hint appears below the dropdown on both settings and onboarding pages, with dark mode support and localized copy. (#109)
+- **Provider promo hint for Octo.** When Octo is selected as provider, a contextual promo hint appears below the dropdown on both settings and onboarding pages, with dark mode support and localized copy. (#109)
 - **Running config for concurrent agent limits.** New `AgentConfig` running configuration and `SessionRegistry` concurrency controls to limit the number of simultaneously active agents, preventing resource exhaustion on busy servers.
 
 ### Improved
@@ -113,15 +113,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.5] - 2026-05-12
 
 ### Added
-- **Telegram channel adapter.** New IM channel adapter that connects openclacky to Telegram via the Bot API. Setup is just a bot token from @BotFather — no browser automation, no QR. Mirrors the existing Feishu / WeCom / Weixin contract: HTTPS long-poll inbound, `sendMessage` / `sendPhoto` / `sendDocument` outbound, photo + document download routed through the standard FileProcessor + vision pipeline, group `@-mention` filtering and `allowed_users` whitelist. `base_url` is configurable to support self-hosted Bot API servers (https://github.com/tdlib/telegram-bot-api) for networks where `api.telegram.org` is unreachable. Frontend Channels panel, `channel-setup` skill, English/Chinese i18n, and `app.css` logo class added. 32 new specs in `spec/clacky/server/channel/adapters/telegram/`.
-- **Discord channel adapter.** Full Discord integration via REST API + Gateway (WebSocket), with channel-setup support, Web UI Channels panel entry, and i18n strings. Connect Clacky to Discord servers for bot interactions through slash commands and message events.
+- **Telegram channel adapter.** New IM channel adapter that connects octo to Telegram via the Bot API. Setup is just a bot token from @BotFather — no browser automation, no QR. Mirrors the existing Feishu / WeCom / Weixin contract: HTTPS long-poll inbound, `sendMessage` / `sendPhoto` / `sendDocument` outbound, photo + document download routed through the standard FileProcessor + vision pipeline, group `@-mention` filtering and `allowed_users` whitelist. `base_url` is configurable to support self-hosted Bot API servers (https://github.com/tdlib/telegram-bot-api) for networks where `api.telegram.org` is unreachable. Frontend Channels panel, `channel-setup` skill, English/Chinese i18n, and `app.css` logo class added. 32 new specs in `spec/octo/server/channel/adapters/telegram/`.
+- **Discord channel adapter.** Full Discord integration via REST API + Gateway (WebSocket), with channel-setup support, Web UI Channels panel entry, and i18n strings. Connect Octo to Discord servers for bot interactions through slash commands and message events.
 - **OpenRouter curated model list.** The OpenRouter provider now ships with a curated dropdown of mainstream Claude and GPT models (Sonnet, Opus, Haiku, GPT-5.5/5.4), so users can pick from the list instead of typing model IDs manually. Full catalogue still accessible by typing any model ID.
-- **OpenRouter lite model pairing.** Subagents on OpenRouter now automatically get a sensible cheap/fast sidekick — Claude family pairs with Haiku, GPT family pairs with the mini variant — matching the behavior already available on the native OpenAI and OpenClacky providers.
+- **OpenRouter lite model pairing.** Subagents on OpenRouter now automatically get a sensible cheap/fast sidekick — Claude family pairs with Haiku, GPT family pairs with the mini variant — matching the behavior already available on the native OpenAI and Octo providers.
 - **MiMo 2.5 Pro (Xiaomi) model support.** Added `mimo-v2.5-pro` to the MiMo provider preset alongside existing MiMo models.
 - **AI key setup guide link.** New users and those configuring API keys now see a "New to AI keys? See the guide →" link on both onboarding and settings pages, pointing to the official documentation.
 
 ### Improved
-- **Default model upgraded to claude-sonnet-4-6.** The OpenClacky provider now defaults to the latest Claude Sonnet model for better performance out of the box.
+- **Default model upgraded to claude-sonnet-4-6.** The Octo provider now defaults to the latest Claude Sonnet model for better performance out of the box.
 
 ### Fixed
 - **Linux server restart stability.** Fixed an inherited socket cleanup bug where WEBrick's shutdown would propagate `SHUT_RDWR` to the shared kernel socket, breaking subsequent `accept()` calls on Linux. The server now detaches inherited sockets before shutdown so worker restarts work reliably.
@@ -130,7 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.4] - 2026-05-11
 
 ### Added
-- **`persist-memory` subagent skill — agents can now save things to long-term memory.** New built-in `persist-memory` skill (forked subagent, auto-summarized, no web tools) handles file naming, topic merging, frontmatter, and size limits when writing to `~/.clacky/memories/`. The memory updater and skill manager now route persistence requests through this subagent for cleaner separation of concerns. Covered by new specs in `memory_updater_spec.rb` and `skill_manager_memories_spec.rb`.
+- **`persist-memory` subagent skill — agents can now save things to long-term memory.** New built-in `persist-memory` skill (forked subagent, auto-summarized, no web tools) handles file naming, topic merging, frontmatter, and size limits when writing to `~/.octo/memories/`. The memory updater and skill manager now route persistence requests through this subagent for cleaner separation of concerns. Covered by new specs in `memory_updater_spec.rb` and `skill_manager_memories_spec.rb`.
 - **System prompts aligned with Claude Code behavioral rules.** Rewrote `base_prompt.md` and the coding/general system prompts with 6 new sections (Code Style, File Modification Rules, Response Style, Git Safety Protocol, Error Handling, Task Tracking). Internal benchmark on 5 tasks showed −40% response verbosity, −24% task duration, and qualitative improvement on 4/5 tasks with no regression in completion rate. (#96)
 - **Local image proxy via `GET /api/local-image` (C-5523).** New HTTP server endpoint exposes local images (e.g. screenshots written by tools) to the Web UI through a controlled proxy, with new `FileProcessor` utilities backing it. 86 new specs in `file_processor_spec.rb`. (#93)
 - **Kimi Code (Coding Plan) provider preset.** New first-class provider entry for Moonshot's Kimi Code coding plan, with proper Anthropic-format cache headers (`cache_creation_input_tokens` / `cache_read_input_tokens`) wired through the client so prompt caching actually lands on the backend. Verified end-to-end against a paid account with 14336 cached tokens hit on the second turn. (#89)
@@ -146,8 +146,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.3] - 2026-05-09
 
 ### Added
-- **Channel send command — push messages from CLI/agent to IM channels.** New `clacky channel send` CLI command and full outbound channel pipeline. The agent can now actively reach out to users on Feishu/WeCom/WeChat (e.g. for cron tasks or background completions) instead of only replying. Includes a new `ChannelManager` for routing, multi-master server discovery, and proper `chat_id` extraction for outbound messages. (#73)
-- **`--model` flag to override the model per invocation.** Run any one-off command with a different model without changing config: `clacky --model gpt-4o-mini "..."`. Useful for quick comparisons or routing specific tasks to cheaper/faster models. (#76)
+- **Channel send command — push messages from CLI/agent to IM channels.** New `octo channel send` CLI command and full outbound channel pipeline. The agent can now actively reach out to users on Feishu/WeCom/WeChat (e.g. for cron tasks or background completions) instead of only replying. Includes a new `ChannelManager` for routing, multi-master server discovery, and proper `chat_id` extraction for outbound messages. (#73)
+- **`--model` flag to override the model per invocation.** Run any one-off command with a different model without changing config: `octo --model gpt-4o-mini "..."`. Useful for quick comparisons or routing specific tasks to cheaper/faster models. (#76)
 - **Fuzzy tool-name resolution for cross-model compatibility.** When a model emits a slightly off tool name (e.g. `read_file` vs `file_reader`, case mismatches, or hyphen/underscore differences), the agent now resolves it to the closest registered tool instead of erroring out. Significantly improves reliability when switching between Claude, GPT, and other providers. (#78)
 - **Context overflow auto-recovery.** When an upstream LLM call hits a context-length error, the agent now detects it via `LlmCaller`'s error classification and automatically compresses message history to retry — instead of bubbling a hard error to the user. Backed by 175 new error-detection and 169 new recovery specs.
 - **Refined session list UI with SVG icons.** Reworked sidebar session list with crisp SVG icons and tightened styling for a more polished look. (#83)
@@ -223,7 +223,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0.beta.5] - 2026-04-29
 
 ### Added
-- **WSL2 mirrored networking mode for localhost access.** Windows users running under WSL2 can now configure mirrored networking, allowing the Clacky server to be reached at `localhost` from the Windows host instead of needing to look up the WSL IP address.
+- **WSL2 mirrored networking mode for localhost access.** Windows users running under WSL2 can now configure mirrored networking, allowing the Octo server to be reached at `localhost` from the Windows host instead of needing to look up the WSL IP address.
 - **Message compressor preserves chunk order.** Compression chunks are now consistently ordered with `chunk-nn` naming, making it easier to browse and understand compressed conversation history.
 - **Session model is now saved.** The currently active model selection is persisted in session data, so it survives page refreshes and server restarts.
 - **Feedback button styling in Web UI.** The feedback interface now has improved CSS styling for a better user experience.
@@ -281,7 +281,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Vision support — agents can now "see" images.** When you attach image files (PNG, JPG, GIF, WebP), the agent can analyze them visually with vision-capable models. Non-vision models automatically fall back to disk references instead of breaking.
-- **DeepSeek V4 (Clacky-DS) provider.** New `deepseekv4` provider preset with native DeepSeek API endpoint, supporting `dsk-deepseek-v4-pro` and `dsk-deepseek-v4-flash` models with accurate pricing.
+- **DeepSeek V4 (Octo-DS) provider.** New `deepseekv4` provider preset with native DeepSeek API endpoint, supporting `dsk-deepseek-v4-pro` and `dsk-deepseek-v4-flash` models with accurate pricing.
 - **Memory subagent.** Long-term memory management now runs as a dedicated background subagent — writes memories when the task reaches meaningful completion, instead of on every turn.
 - **Usage telemetry.** Anonymous usage data collection helps us understand how the product is used and prioritize improvements. No personal or conversation data is collected.
 - **Brand configuration auto-refresh.** White-label brand settings now refresh automatically when the WebUI starts up, no manual restart needed.
@@ -292,7 +292,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Model switching more robust.** CLI slash commands (/config) now work seamlessly, server-side routing handles dynamic endpoints correctly, and switching between all provider types is more reliable.
 
 ### Fixed
-- **Access key now persists via cookies.** The WebUI login key was stored only in `localStorage`, causing WebSocket connections to lose authentication. Now also written to a `clacky_access_key` cookie for consistent auth across all connection types.
+- **Access key now persists via cookies.** The WebUI login key was stored only in `localStorage`, causing WebSocket connections to lose authentication. Now also written to a `octo_access_key` cookie for consistent auth across all connection types.
 - **MiniMax → DeepSeek switch error.** Switching models from MiniMax to DeepSeek no longer fails due to mismatched message format handling.
 - **Bedrock truncated tool call recovery.** When AWS Bedrock truncates a tool call mid-argument, the agent now detects the error, sends feedback, and successfully retries on the next turn.
 - **Sidebar "Load More" scroll jump.** Clicking "Load More" at the bottom of the session list no longer jerks the sidebar back to the active session — scroll position is now preserved.
@@ -302,7 +302,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.9.38] - 2026-04-24
 
 ### Fixed
-- **Access key now persists correctly via cookie**. When the Web UI server was configured with `--access-key`, the key entered at login was stored only in `localStorage` — but WebSocket connections and some API requests read the key from cookies. This mismatch caused authenticated sessions to sporadically lose access (e.g. WebSocket falling back to unauthorized). The auth flow now writes the key to both `localStorage` _and_ a `clacky_access_key` cookie, and probes the server using the cookie. Incorrect keys are cleared from both stores before retry. Up to 3 attempts are allowed before giving up.
+- **Access key now persists correctly via cookie**. When the Web UI server was configured with `--access-key`, the key entered at login was stored only in `localStorage` — but WebSocket connections and some API requests read the key from cookies. This mismatch caused authenticated sessions to sporadically lose access (e.g. WebSocket falling back to unauthorized). The auth flow now writes the key to both `localStorage` _and_ a `octo_access_key` cookie, and probes the server using the cookie. Incorrect keys are cleared from both stores before retry. Up to 3 attempts are allowed before giving up.
 
 ### More
 - Auth prompt input field now uses `type="password"` while the user is typing (reverts to text after), preventing shoulder-surfing
@@ -317,8 +317,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **New `Terminal.run_sync` internal API** for Ruby callers that need synchronous command capture (drop-in replacement for `Open3.capture2e`, but using the same PTY + login-shell + Security pipeline as the AI-facing tool).
-- **DeepSeek V4 provider preset.** New `deepseekv4` entry in `Clacky::Providers` (positioned right after `openrouter`) with default model `deepseek-v4-pro` and models list `deepseek-v4-flash`, `deepseek-v4-pro`, plus the deprecated-aliases `deepseek-chat` / `deepseek-reasoner` (to be removed on 2026-07-24). Uses the OpenAI-compatible endpoint `https://api.deepseek.com`; for Anthropic-format usage, point `base_url` at `https://api.deepseek.com/anthropic` and switch `api` to `anthropic-messages`.
-- **DeepSeek V4 pricing.** Added `deepseek-v4-flash` ($0.14 in / $0.28 out / $0.028 cache-hit per MTok) and `deepseek-v4-pro` ($1.74 in / $3.48 out / $0.145 cache-hit per MTok) to `Clacky::ModelPricing::PRICING_TABLE`. Legacy aliases `deepseek-chat` and `deepseek-reasoner` normalize to `deepseek-v4-flash`. DeepSeek has no separate cache-write charge, so cache writes are billed at the cache-miss (input) rate. Prices sourced from the official pricing page (USD per 1M tokens).
+- **DeepSeek V4 provider preset.** New `deepseekv4` entry in `Octo::Providers` (positioned right after `openrouter`) with default model `deepseek-v4-pro` and models list `deepseek-v4-flash`, `deepseek-v4-pro`, plus the deprecated-aliases `deepseek-chat` / `deepseek-reasoner` (to be removed on 2026-07-24). Uses the OpenAI-compatible endpoint `https://api.deepseek.com`; for Anthropic-format usage, point `base_url` at `https://api.deepseek.com/anthropic` and switch `api` to `anthropic-messages`.
+- **DeepSeek V4 pricing.** Added `deepseek-v4-flash` ($0.14 in / $0.28 out / $0.028 cache-hit per MTok) and `deepseek-v4-pro` ($1.74 in / $3.48 out / $0.145 cache-hit per MTok) to `Octo::ModelPricing::PRICING_TABLE`. Legacy aliases `deepseek-chat` and `deepseek-reasoner` normalize to `deepseek-v4-flash`. DeepSeek has no separate cache-write charge, so cache writes are billed at the cache-miss (input) rate. Prices sourced from the official pricing page (USD per 1M tokens).
 
 ## [0.9.36] - 2026-04-24
 
@@ -336,7 +336,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Unified Terminal tool**: merged the old `safe_shell` and `shell` tools into a single `terminal` tool with persistent PTY sessions — the agent can now keep a shell session alive across tool calls, send input to running prompts, poll long-running commands, and safely interrupt them (`Ctrl+C` / `Ctrl+D`). Replaces 1000+ lines of duplicated shell-handling logic with a cleaner, better-tested implementation.
-- **Access key authentication for server mode**: start the Web UI server with `--access-key <key>` (or `CLACKY_ACCESS_KEY` env var) to require a login before anyone can open sessions — safe to expose the Web UI over the network or to share a running instance
+- **Access key authentication for server mode**: start the Web UI server with `--access-key <key>` (or `OCTO_ACCESS_KEY` env var) to require a login before anyone can open sessions — safe to expose the Web UI over the network or to share a running instance
 - **Session debug download**: from the Web UI you can now download a full session bundle (messages, tool calls, config) as a zip for debugging or sharing — useful for bug reports and post-mortems
 - **Scheduler now saves session state**: scheduled/cron tasks now persist their session after each run, so you can inspect what the scheduled task actually did from the Web UI just like a normal session
 - **Web UI visual redesign**: substantial redesign of the sidebar, session list, settings panel, and theme — cleaner spacing, better contrast in both light and dark modes, smoother transitions
@@ -380,7 +380,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.9.33] - 2026-04-20
 
 ### Fixed
-- **Skill evolution targets only user skills**: auto-evolution (skill auto-creation and skill reflection) now skips default and brand skills — only user-created skills in `~/.clacky/skills/` or `.clacky/skills/` are eligible for improvement
+- **Skill evolution targets only user skills**: auto-evolution (skill auto-creation and skill reflection) now skips default and brand skills — only user-created skills in `~/.octo/skills/` or `.octo/skills/` are eligible for improvement
 - **Skill auto-creation and reflection run in isolated subagents**: these background analysis tasks no longer inject messages into the main conversation history; they now fork a dedicated subagent that runs fully independently, preventing any interference with the current session
 - **User feedback prompt no longer interrupts agent flow**: removed stray `STOP.` prefix from the in-conversation user-feedback message, allowing the agent to handle feedback naturally without halting unexpectedly
 
@@ -425,7 +425,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.9.30] - 2026-04-16
 
 ### Added
-- **OpenClacky provider support**: new built-in provider preset for OpenClacky API (https://api.openclacky.com) with Claude Opus 4.6, Sonnet 4.6/4.5, and Haiku 4.5 models
+- **Octo provider support**: new built-in provider preset for Octo API (https://api.octo.com) with Claude Opus 4.6, Sonnet 4.6/4.5, and Haiku 4.5 models
 - **Session chunk index system**: compressed conversation chunks now include a searchable index with topics and turn counts — the agent can selectively load only relevant historical context instead of re-reading all compressed messages, dramatically reducing token usage in long sessions
 - **Provider availability indicator**: Web UI now shows a real-time status badge (Available/Unavailable) next to each provider in the settings modal, helping users quickly identify which services are reachable
 
@@ -483,7 +483,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Image understanding in file_reader**: the agent can now read and analyse images (PNG, JPG, GIF, WebP) by sending them to the vision API — just attach or reference an image file
 - **Image auto-resize before upload**: large images are automatically resized to fit within model limits (max 5 MB base64), so vision requests no longer fail on high-resolution files
 - **Rails project installer script**: new `install_rails_deps.sh` script sets up a complete Ruby on Rails development environment (Ruby, Bundler, Node, Yarn, PostgreSQL) in one command
-- **Uninstall script**: new `scripts/uninstall.sh` to cleanly remove the openclacky gem and its associated files
+- **Uninstall script**: new `scripts/uninstall.sh` to cleanly remove the octo gem and its associated files
 - **Shell script build system**: `scripts/build/` now contains a template compiler (`.sh.cc` → `.sh`) with dependency checking — install scripts are generated from composable library modules
 - **stdout streaming in Web UI**: agent tool output and shell results are now streamed live to the browser as they arrive, rather than waiting for a full response
 - **Ctrl+O shortcut in CLI**: pressing Ctrl+O in the terminal UI opens a file/output viewer for the current session
@@ -498,7 +498,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Shell UTF-8 warning suppression**: eliminated noisy encoding warnings that appeared in shell tool output on some macOS setups
 
 ### More
-- Lite mode configuration groundwork for clackyai platform
+- Lite mode configuration groundwork for octoai platform
 - Rails new-project skill updated with improved environment checker
 - `new` skill improvements: http_server integration and tool category support
 
@@ -563,12 +563,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI -c option model initialization**: fixed a bug where the CLI command with -c option was not passing the model name to the client, causing routing failures for certain providers
 
 ### More
-- ClackyAI provider updated to use the latest model name format (abs- prefix)
+- OctoAI provider updated to use the latest model name format (abs- prefix)
 
 ## [0.9.22] - 2026-03-31
 
 ### Added
-- **ClackyAI provider (Bedrock with prompt caching)**: added `clackyai` as a first-class provider — uses AWS Bedrock under the hood with prompt caching enabled, normalising token usage to Anthropic semantics so cost calculation works correctly
+- **OctoAI provider (Bedrock with prompt caching)**: added `octoai` as a first-class provider — uses AWS Bedrock under the hood with prompt caching enabled, normalising token usage to Anthropic semantics so cost calculation works correctly
 - **Browser auto-install script**: `browser-setup` skill can now detect the Chrome/Edge version and automatically download and run the install script, reducing manual setup steps
 
 ### Fixed
@@ -592,7 +592,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **SSL error retry**: LLM API calls now automatically retry on SSL errors (same as other network failures — up to 10 retries with 5s delay)
 
 ### Fixed
-- **Brand wrapper not found under root**: the install script now places the brand command wrapper in the same directory as the `openclacky` binary, so it is always on PATH regardless of whether running as root or a normal user
+- **Brand wrapper not found under root**: the install script now places the brand command wrapper in the same directory as the `octo` binary, so it is always on PATH regardless of whether running as root or a normal user
 
 ### Improved
 - **Cron task management refactored to API**: cron task CRUD operations now go through the HTTP API instead of running ad-hoc Ruby scripts, making the scheduler more reliable and easier to maintain
@@ -637,13 +637,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **WebSocket auto-reconnect for Feishu and WeCom channels**: the WebSocket clients for Feishu and WeCom now automatically retry the connection after failures — channels stay online without manual intervention after a network hiccup
-- **Brand command in simple install script**: the `clacky` brand command was incorrectly invoked in `install_simple.sh` — now fixed so the post-install branding step runs correctly
+- **Brand command in simple install script**: the `octo` brand command was incorrectly invoked in `install_simple.sh` — now fixed so the post-install branding step runs correctly
 - **Windows WSL2 and Hyper-V detection in PowerShell installer**: improved detection logic for WSL2 and Hyper-V environments in `install.ps1`, reducing false negatives on Windows machines with non-standard configurations
 
 ## [0.9.16] - 2026-03-27
 
 ### Fixed
-- **Skill templates now expand `${ENV_VAR}` placeholders**: skill SKILL.md files can reference environment variables like `${CLACKY_SERVER_HOST}` and `${CLACKY_SERVER_PORT}` — they are now automatically substituted at load time (unknown variables are left as-is)
+- **Skill templates now expand `${ENV_VAR}` placeholders**: skill SKILL.md files can reference environment variables like `${OCTO_SERVER_HOST}` and `${OCTO_SERVER_PORT}` — they are now automatically substituted at load time (unknown variables are left as-is)
 - **gemrc restored to default when switching from CN to global network**: the install script now correctly restores the system gemrc when the user switches from China mirror mode to the global network, preventing stale mirror configuration from persisting
 
 ## [0.9.15] - 2026-03-27
@@ -689,7 +689,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Browser tool `evaluate` targets active page**: JavaScript evaluation now automatically targets the currently active browser tab instead of the last opened one, so `evaluate` always runs in the right context
 - **Browser MCP process cleaned up on server shutdown**: the `chrome-devtools-mcp` node process is now stopped when the server shuts down, preventing orphaned processes that held onto port 7070
 - **Server worker process isolation**: workers are now spawned in their own process group, ensuring grandchild processes (e.g. browser MCP) are fully cleaned up during zero-downtime restarts
-- **Channel status via live API**: `channel status` now queries the running server API instead of reading `~/.clacky/channels.yml` directly, so it reflects the actual runtime state
+- **Channel status via live API**: `channel status` now queries the running server API instead of reading `~/.octo/channels.yml` directly, so it reflects the actual runtime state
 - **Idle compression timer race fix**: the compression thread is now registered inside a mutex before starting, eliminating a race where `cancel()` could miss an in-flight compression and leave history in an inconsistent state
 - **Compression token display accuracy**: the post-compression token count now uses the rebuilt history estimate instead of the stale pre-compression API count
 - **Shell process group signals**: `SIGTERM`/`SIGKILL` are now sent to the entire process group (`-pgid`) instead of just the child PID, ensuring backgrounded subprocesses are also killed on timeout
@@ -700,12 +700,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Default model updated to Claude claude-sonnet-4-6**: bumped the default Gemini model reference from `gemini-2.5-flash` → `gemini-2.7-flash`
 
 ### More
-- Renamed gem references from `open-clacky` to `openclacky` across docs, gemspec, and scripts
+- Renamed gem references from `open-octo` to `octo` across docs, gemspec, and scripts
 
 ## [0.9.10] - 2026-03-24
 
 ### Added
-- **One-click gem upgrade in Web UI**: a new "Upgrade" button in the Web UI lets you update Clacky to the latest version without touching the terminal
+- **One-click gem upgrade in Web UI**: a new "Upgrade" button in the Web UI lets you update Octo to the latest version without touching the terminal
 - **WebSocket connection status tips**: the Web UI now shows a clear indicator when the WebSocket connection is lost or reconnecting, so you always know if the server is reachable
 - **Master/worker server architecture**: the server now runs in a master + worker process model, enabling zero-downtime gem upgrades — the master restarts workers seamlessly after an upgrade
 
@@ -744,7 +744,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Sessions list in Web UI**: a dedicated sessions UI shows all your recent conversations with source badges and load-more pagination
 - **Setup session type**: a special onboarding session type is available to guide new users through initial configuration
 - **Personal website skill**: a built-in skill that generates and publishes a personal profile page (linktree-style) from your user profile
-- **Sub-directory `.clackyrules` loading**: project rules files in subdirectories are now discovered and merged automatically
+- **Sub-directory `.octorules` loading**: project rules files in subdirectories are now discovered and merged automatically
 - **Self-improving response parser**: the parser now repairs itself when it encounters malformed tool-call sequences, improving reliability with all models
 - **UJK format support**: the agent can now handle UJK-encoded content in file and channel inputs
 - **Browser toggle in Web UI**: a toggle in the settings sidebar lets you enable or disable browser control without restarting
@@ -792,7 +792,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Skills can now be installed from local zip files**: `skill-add` now accepts a local file path (not just a URL), so you can install skills from a downloaded zip without hosting it anywhere
 - **Skill import bar in Web UI**: the Skills settings page now has an import bar where you can paste a URL or upload a local zip file directly — no terminal needed to install new skills
 - **`$SKILL_DIR` available in skill instructions**: skill files can now reference `$SKILL_DIR` to get the absolute path to their own directory, making it easy to reference supporting files with correct paths
-- **`product-help` built-in skill**: the agent can now answer questions about Clacky's own features, configuration, and usage through a dedicated built-in skill
+- **`product-help` built-in skill**: the agent can now answer questions about Octo's own features, configuration, and usage through a dedicated built-in skill
 
 ### Fixed
 - **PDF and Office files now appear in glob results**: file discovery tools no longer skip `.pdf`, `.docx`, and other document formats — they show up correctly in file listings
@@ -838,7 +838,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.9.3] - 2026-03-16
 
 ### Added
-- **Brand logo banner on web server startup**: a styled block-font logo now displays in the terminal when `clacky server` launches, giving a polished startup experience
+- **Brand logo banner on web server startup**: a styled block-font logo now displays in the terminal when `octo server` launches, giving a polished startup experience
 - **BlockFont renderer replaces artii dependency**: the gem now ships its own high-quality block-font engine for rendering large ASCII logos, removing the external `artii` dependency and enabling full offline use
 - **Hover-to-expand token usage and session info bar**: hovering over the token usage line or session info bar in the WebUI now expands it to show full details, keeping the UI compact by default
 - **Redesigned setup panel with Back button and Custom provider support**: the model setup flow now includes a Back button for navigation and a dedicated "Custom provider" path, making it easier to configure non-standard API endpoints; also fixes a dropdown re-entry bug
@@ -848,7 +848,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Improved
 - **Browser tool simplified and config-driven**: the browser tool setup is now handled through a unified config object, removing ~250 lines of complex auto-restart logic and making the tool more predictable and maintainable
 - **Prompt caching more stable**: cache anchoring now uses the last assistant message as the stable boundary, reducing cache misses caused by system prompt variations; caching is correctly restored for both Anthropic and OpenRouter paths
-- **Message format extracted to dedicated modules**: OpenAI and Anthropic message formatting now live in separate modules (`Clacky::MessageFormat::OpenAI` and `Clacky::MessageFormat::Anthropic`), making the client code easier to read and test
+- **Message format extracted to dedicated modules**: OpenAI and Anthropic message formatting now live in separate modules (`Octo::MessageFormat::OpenAI` and `Octo::MessageFormat::Anthropic`), making the client code easier to read and test
 - **WeCom channel reliability**: auth failure handling is improved with proper reconnection logic; the `channel-setup` skill guidance is also updated for clarity
 - **Install script and license expiry handling**: the install script is streamlined, license-expired states are handled gracefully, and encrypted skills are decrypted at load time
 
@@ -923,9 +923,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **PDF file upload and reading**: users can now upload PDF files directly in the WebUI chat; the agent reads and analyzes the content via the built-in `pdf-reader` skill
-- **WebUI favicon and SVG icons**: browser tab now shows the Clacky icon
+- **WebUI favicon and SVG icons**: browser tab now shows the Octo icon
 - **Public skill store install**: skills from the public store can be installed directly via the WebUI without a GitHub URL
-- **Auto-kill previous server on startup**: launching `clacky serve` now automatically kills any previously running instance via pidfile, preventing port conflicts
+- **Auto-kill previous server on startup**: launching `octo serve` now automatically kills any previously running instance via pidfile, preventing port conflicts
 
 ### Improved
 - **Brand skill loading speed**: loading brand skills no longer triggers a network decryption request — name and description are now read from the local `brand_skills.json` cache, making New Session significantly faster
@@ -958,7 +958,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Skill autocomplete UI**: enhanced slash-command autocomplete interaction — better keyboard navigation, input behavior, and visual feedback (#6)
 - **Chrome setup UX**: simplified Chrome installation flow with improved error messages and progress indicators (#8)
 - **WebUI colors and layout**: polished light/dark mode colors, sidebar alignment, and badge styles for a more consistent look
-- **Test suite speed**: `CLACKY_TEST` guard prevents brand skill network calls during tests — suite now runs ~60× faster per example
+- **Test suite speed**: `OCTO_TEST` guard prevents brand skill network calls during tests — suite now runs ~60× faster per example
 
 ### Fixed
 - **Duplicate user bubble on skill install**: prevented an extra chat bubble appearing when installing a skill from the store
@@ -975,7 +975,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **SSL connection on mise/Homebrew Ruby**: disabled SSL certificate verification in Faraday HTTP client to fix `SSL_connect` errors that affected users who installed Ruby via `mise` + Homebrew on macOS (where the system CA bundle is not linked automatically)
-- **ChannelManager startup crash**: fixed `NoMethodError` for undefined `Clacky.logger` — now correctly calls `Clacky::Logger`
+- **ChannelManager startup crash**: fixed `NoMethodError` for undefined `Octo.logger` — now correctly calls `Octo::Logger`
 
 ## [0.8.4] - 2026-03-10
 
@@ -991,7 +991,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **UTF-8 input handling**: invalid UTF-8 bytes in terminal UI input and output are now scrubbed cleanly instead of raising encoding errors
 - **UI thread deadlock**: progress and fullscreen threads now stop gracefully on shutdown, preventing rare deadlocks
 - **IME composition input**: slash `/` command button is now disabled during IME composition (e.g. Chinese input), preventing double-submit on Enter
-- **CLI `clear` command**: fixed a regression that broke the `clacky clear` command
+- **CLI `clear` command**: fixed a regression that broke the `octo clear` command
 
 ### More
 - Refactor: rename `set_skill_loader` to `set_agent` in `UiController` for clarity
@@ -1028,9 +1028,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Agent profile system**: define named agent profiles (`--agent coding|general`) with custom system prompts and skill whitelists via `profile.yml`; built-in `coding` and `general` profiles included
 - **Skill autocomplete dropdown** in the web UI: type `/` in the chat input to see a filtered list of available skills
-- **File-based logger** (`Clacky::Logger`): thread-safe structured logging to `~/.clacky/logs/` for debugging agent sessions
+- **File-based logger** (`Octo::Logger`): thread-safe structured logging to `~/.octo/logs/` for debugging agent sessions
 - **Session persistence on startup**: server now restores the most recent session for the working directory automatically on boot
-- **Long-term memory update system**: agent automatically updates `~/.clacky/memories/` after sessions using a whitelist-driven approach; memories persist across restarts and are injected into agent context on startup
+- **Long-term memory update system**: agent automatically updates `~/.octo/memories/` after sessions using a whitelist-driven approach; memories persist across restarts and are injected into agent context on startup
 - **recall-memory skill with smart meta injection**: the `recall-memory` skill now receives a pre-built index of all memory files (topic, description, last updated) so the agent can selectively load only relevant memories without reading every file
 - **Compressed message archiving**: older messages are compressed and archived to chunk Markdown files to keep context window manageable
 - **Network pre-flight check**: connection is verified before agent starts; helpful VPN/proxy suggestions shown on failure
@@ -1050,7 +1050,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `working_dir: nil` added to all tool `execute` signatures to fix unknown keyword errors
 
 ### More
-- `clacky` install script robustness and UX improvements
+- `octo` install script robustness and UX improvements
 - Disabled rdoc/ri generation on gem install for faster installs
 - Strip `.git/.svn/.hg` directories from glob results
 
@@ -1117,7 +1117,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.7.7] - 2026-03-04
 
 ### Added
-- Web UI server with WebSocket support for real-time agent interaction in the browser (`clacky serve`)
+- Web UI server with WebSocket support for real-time agent interaction in the browser (`octo serve`)
 - Task scheduler with cron-based automation, REST API, and scheduled task execution
 - Settings panel in web UI for viewing and editing AI model configurations (API keys, base URL, provider presets)
 - Image upload support in web UI with attach button for multimodal prompts
@@ -1169,7 +1169,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Improved
 - Shell tool now reliably loads user environment (PATH, rbenv, nvm, etc.) on every execution
-- Session list shows resume tip (`clacky -a <session_id>`) to help users continue previous sessions
+- Session list shows resume tip (`octo -a <session_id>`) to help users continue previous sessions
 
 ### More
 - Add GitHub Release creation step to gem-release skill
@@ -1181,7 +1181,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Real-time command output viewing with Ctrl+O hotkey
 - GitHub skill installation support in skill-add
 - Rails project creation scripts in new skill
-- Auto-create ~/clacky_workspace when starting from home directory
+- Auto-create ~/octo_workspace when starting from home directory
 
 ### Improved
 - System prompt with glob tool usage guidance
@@ -1303,7 +1303,7 @@ This is a major release with significant improvements to skill system, conversat
 **Skill System**
 - Complete skill framework allowing users to extend AI capabilities with custom workflows
 - Skills can be invoked using shorthand syntax (e.g., `/commit`, `/gem-release`)
-- Support for user-created skills in `.clacky/skills/` directory
+- Support for user-created skills in `.octo/skills/` directory
 - Built-in skills: commit (smart Git helper), gem-release (automated publishing)
 
 **Memory Compression**
@@ -1368,7 +1368,7 @@ This is a major release with significant improvements to skill system, conversat
 ### Added
 - Complete skill system with loader and core functionality
 - Default skill support with auto-loading mechanism
-- Skills CLI command for skill management (`clacky skills list/show/create`)
+- Skills CLI command for skill management (`octo skills list/show/create`)
 - Command suggestions UI component for better user guidance
 - Skip safety check option for safe_shell tool
 - UI2 component comprehensive test suite
@@ -1527,7 +1527,7 @@ This is a major release with significant improvements to skill system, conversat
   - `plan_only` - Plan without executing
 - **Cost Control**: Track and limit API usage costs
 - **Message Compression**: Automatic conversation history compression
-- **Project Rules**: Support for `.clackyrules`, `.cursorrules`, and `CLAUDE.md`
+- **Project Rules**: Support for `.octorules`, `.cursorrules`, and `CLAUDE.md`
 - **Interactive Confirmations**: Preview diffs and shell commands before execution
 - **Hook System**: Extensible event hooks for customization
 
@@ -1547,24 +1547,24 @@ This is a major release with significant improvements to skill system, conversat
 ## [0.1.0] - 2025-12-27
 
 ### Added
-- Initial release of Clacky
+- Initial release of Octo
 - Interactive chat mode for conversations with Claude
 - Single message mode for quick queries
 - Configuration management for API keys
 - Support for Claude 3.5 Sonnet model
 - Colorful terminal output with TTY components
-- Secure API key storage in `~/.clacky/config.yml`
+- Secure API key storage in `~/.octo/config.yml`
 - Multi-turn conversation support with context preservation
 - Command-line interface powered by Thor
 - Comprehensive test suite with RSpec
 
 ### Features
-- `clacky chat [MESSAGE]` - Start interactive chat or send single message
-- `clacky config set` - Configure API key
-- `clacky config show` - Display current configuration
-- `clacky version` - Show version information
+- `octo chat [MESSAGE]` - Start interactive chat or send single message
+- `octo config set` - Configure API key
+- `octo config show` - Display current configuration
+- `octo version` - Show version information
 - Model selection via `--model` option
 
-[Unreleased]: https://github.com/yafeilee/clacky/compare/v0.5.0...HEAD
-[0.5.0]: https://github.com/yafeilee/clacky/compare/v0.1.0...v0.5.0
-[0.1.0]: https://github.com/yafeilee/clacky/releases/tag/v0.1.0
+[Unreleased]: https://github.com/yafeilee/octo/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/yafeilee/octo/compare/v0.1.0...v0.5.0
+[0.1.0]: https://github.com/yafeilee/octo/releases/tag/v0.1.0
