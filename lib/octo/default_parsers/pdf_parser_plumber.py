@@ -13,7 +13,7 @@ Output:
     exit 2  — dependency missing
 
 Called from pdf_parser.rb as the second-tier extractor (after pdftotext).
-This script is copied into ~/.clacky/parsers/ and can be edited freely by
+This script is copied into ~/.octo/parsers/ and can be edited freely by
 the LLM — e.g. to tune table extraction, layout heuristics, or filter out
 boilerplate headers/footers. Edit, then re-run to test.
 

@@ -5,10 +5,10 @@ Combines run_eval.py and improve_description.py in a loop, tracking history
 and returning the best description found. Supports train/test split to prevent
 overfitting.
 
-Clacky adaptation:
+Octo adaptation:
 - Queries execute serially (no parallel workers; --num-workers ignored)
-- Model comes from ~/.clacky/config.yml (--model is kept for compat but ignored)
-- Skill dir: ~/.clacky/skills/
+- Model comes from ~/.octo/config.yml (--model is kept for compat but ignored)
+- Skill dir: ~/.octo/skills/
 """
 
 import argparse
@@ -57,7 +57,7 @@ def run_loop(
     verbose: bool,
     live_report_path: Path | None = None,
     log_dir: Path | None = None,
-    # Legacy params (kept for API compat, ignored in Clacky)
+    # Legacy params (kept for API compat, ignored in Octo)
     num_workers: int = 1,
     model: str = "",
 ) -> dict:
@@ -242,7 +242,7 @@ def run_loop(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run eval + improve loop (Clacky)")
+    parser = argparse.ArgumentParser(description="Run eval + improve loop (Octo)")
     parser.add_argument("--eval-set", required=True, help="Path to eval set JSON file")
     parser.add_argument("--skill-path", required=True, help="Path to skill directory")
     parser.add_argument("--description", default=None, help="Override starting description")
@@ -255,8 +255,8 @@ def main():
     parser.add_argument("--report", default="auto", help="HTML report path ('auto'=temp file, 'none'=disable)")
     parser.add_argument("--results-dir", default=None, help="Save results.json + report.html to a timestamped subdir here")
     # Ignored legacy args (kept for CLI compat)
-    parser.add_argument("--num-workers", type=int, default=1, help="Ignored — Clacky runs serially")
-    parser.add_argument("--model", default="", help="Ignored — model comes from ~/.clacky/config.yml")
+    parser.add_argument("--num-workers", type=int, default=1, help="Ignored — Octo runs serially")
+    parser.add_argument("--model", default="", help="Ignored — model comes from ~/.octo/config.yml")
     args = parser.parse_args()
 
     eval_set = json.loads(Path(args.eval_set).read_text())

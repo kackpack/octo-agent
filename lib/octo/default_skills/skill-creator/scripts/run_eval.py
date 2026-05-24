@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Run trigger evaluation for a skill description.
 
-Tests whether Clacky's agent triggers (invokes) a skill for a set of queries.
-Runs clacky agent --json in persistent mode, sends queries via stdin NDJSON,
+Tests whether Octo's agent triggers (invokes) a skill for a set of queries.
+Runs octo agent --json in persistent mode, sends queries via stdin NDJSON,
 detects {"type":"tool_call","name":"invoke_skill","args":{"skill_name":"<name>"}}
 events, and returns pass/fail results as JSON.
 
-Executes queries serially (Clacky is single-agent, no parallel workers).
+Executes queries serially (Octo is single-agent, no parallel workers).
 """
 
 import argparse
@@ -23,15 +23,15 @@ from pathlib import Path
 from scripts.utils import parse_skill_md
 
 
-CLACKY_BIN = shutil.which("clacky") or "/Users/sizzy/.local/share/mise/shims/clacky"
-SKILLS_DIR = Path.home() / ".clacky" / "skills"
+OCTO_BIN = shutil.which("octo") or "/Users/sizzy/.local/share/mise/shims/octo"
+SKILLS_DIR = Path.home() / ".octo" / "skills"
 
 
 def find_project_root() -> Path:
     """Find the project root by walking up from cwd, used for --path arg."""
     current = Path.cwd()
     for parent in [current, *current.parents]:
-        if (parent / ".clacky").is_dir():
+        if (parent / ".octo").is_dir():
             return parent
     return current
 
@@ -78,9 +78,9 @@ def run_single_query(
     timeout: int,
     project_root: str,
 ) -> bool:
-    """Run a single query via clacky agent --json and detect skill trigger.
+    """Run a single query via octo agent --json and detect skill trigger.
 
-    Creates a temp skill in ~/.clacky/skills/, starts clacky agent in JSON mode,
+    Creates a temp skill in ~/.octo/skills/, starts octo agent in JSON mode,
     sends the query, watches for invoke_skill tool_call event targeting our temp skill.
     """
     unique_id = uuid.uuid4().hex[:8]
@@ -100,9 +100,9 @@ def run_single_query(
         )
         (temp_skill_dir / "SKILL.md").write_text(skill_md)
 
-        # Launch clacky agent in persistent JSON mode
+        # Launch octo agent in persistent JSON mode
         proc = subprocess.Popen(
-            [CLACKY_BIN, "agent", "--json", "--mode", "auto_approve",
+            [OCTO_BIN, "agent", "--json", "--mode", "auto_approve",
              "--path", project_root],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
@@ -203,8 +203,8 @@ def run_eval(
 ) -> dict:
     """Run the full eval set serially and return results.
 
-    Note: Clacky is single-agent — queries are executed serially, not in parallel.
-    Each query spawns a fresh clacky agent process to avoid session contamination.
+    Note: Octo is single-agent — queries are executed serially, not in parallel.
+    Each query spawns a fresh octo agent process to avoid session contamination.
     """
     results = []
     query_triggers: dict[str, list[bool]] = {}
@@ -263,7 +263,7 @@ def run_eval(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run trigger evaluation for a skill description (Clacky)")
+    parser = argparse.ArgumentParser(description="Run trigger evaluation for a skill description (Octo)")
     parser.add_argument("--eval-set", required=True, help="Path to eval set JSON file")
     parser.add_argument("--skill-path", required=True, help="Path to skill directory")
     parser.add_argument("--description", default=None, help="Override description to test")
@@ -271,9 +271,9 @@ def main():
     parser.add_argument("--runs-per-query", type=int, default=1, help="Number of runs per query (serially)")
     parser.add_argument("--trigger-threshold", type=float, default=0.5, help="Trigger rate threshold")
     parser.add_argument("--verbose", action="store_true", help="Print progress to stderr")
-    # --num-workers kept for CLI compat but ignored (Clacky is serial)
-    parser.add_argument("--num-workers", type=int, default=1, help="Ignored — Clacky runs serially")
-    parser.add_argument("--model", default=None, help="Ignored — model comes from ~/.clacky/config.yml")
+    # --num-workers kept for CLI compat but ignored (Octo is serial)
+    parser.add_argument("--num-workers", type=int, default=1, help="Ignored — Octo runs serially")
+    parser.add_argument("--model", default=None, help="Ignored — model comes from ~/.octo/config.yml")
     args = parser.parse_args()
 
     eval_set = json.loads(Path(args.eval_set).read_text())

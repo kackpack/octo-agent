@@ -3,7 +3,7 @@
 
 Takes eval results (from run_eval.py) and generates an improved description
 by calling the LLM API directly via OpenRouter (reads credentials from
-~/.clacky/config.yml — no separate API key needed).
+~/.octo/config.yml — no separate API key needed).
 """
 
 import argparse
@@ -20,15 +20,15 @@ import yaml  # PyYAML — available in most Python envs; fallback parser below
 from scripts.utils import parse_skill_md
 
 
-def _load_clacky_api_config() -> dict:
-    """Load the default API config from ~/.clacky/config.yml.
+def _load_octo_api_config() -> dict:
+    """Load the default API config from ~/.octo/config.yml.
 
     Returns a dict with keys: api_key, base_url, model.
     Raises RuntimeError if config is missing or malformed.
     """
-    config_path = Path.home() / ".clacky" / "config.yml"
+    config_path = Path.home() / ".octo" / "config.yml"
     if not config_path.exists():
-        raise RuntimeError(f"~/.clacky/config.yml not found. Cannot call LLM API.")
+        raise RuntimeError(f"~/.octo/config.yml not found. Cannot call LLM API.")
 
     raw = config_path.read_text()
 
@@ -39,7 +39,7 @@ def _load_clacky_api_config() -> dict:
         configs = _parse_yaml_fallback(raw)
 
     if not configs or not isinstance(configs, list):
-        raise RuntimeError("~/.clacky/config.yml is empty or not a list.")
+        raise RuntimeError("~/.octo/config.yml is empty or not a list.")
 
     # Use the entry marked type: default, or the first entry
     default = next((c for c in configs if c.get("type") == "default"), configs[0])
@@ -47,7 +47,7 @@ def _load_clacky_api_config() -> dict:
     required = ["api_key", "base_url", "model"]
     missing = [k for k in required if not default.get(k)]
     if missing:
-        raise RuntimeError(f"~/.clacky/config.yml missing fields: {missing}")
+        raise RuntimeError(f"~/.octo/config.yml missing fields: {missing}")
 
     return {
         "api_key": default["api_key"],
@@ -123,7 +123,7 @@ def improve_description(
     iteration: int | None = None,
 ) -> str:
     """Call LLM to improve the description based on eval results."""
-    config = _load_clacky_api_config()
+    config = _load_octo_api_config()
     # model arg is ignored — we use the model from config.yml
     # (kept for API compatibility with run_loop.py)
 
@@ -144,7 +144,7 @@ def improve_description(
     else:
         scores_summary = f"Train: {train_score}"
 
-    prompt = f"""You are optimizing a skill description for a Clacky skill called "{skill_name}". A "skill" is sort of like a prompt, but with progressive disclosure — there's a title and description that the agent sees when deciding whether to use the skill, and then if it does use the skill, it reads the .md file which has lots more details and potentially links to other resources in the skill folder like helper files and scripts and additional documentation or examples.
+    prompt = f"""You are optimizing a skill description for a Octo skill called "{skill_name}". A "skill" is sort of like a prompt, but with progressive disclosure — there's a title and description that the agent sees when deciding whether to use the skill, and then if it does use the skill, it reads the .md file which has lots more details and potentially links to other resources in the skill folder like helper files and scripts and additional documentation or examples.
 
 The description appears in the agent's "available_skills" list. When a user sends a query, the agent decides whether to invoke the skill based solely on the title and on this description. Your goal is to write a description that triggers for relevant queries, and doesn't trigger for irrelevant ones.
 
@@ -260,7 +260,7 @@ def main():
     parser.add_argument("--eval-results", required=True, help="Path to eval results JSON (from run_eval.py)")
     parser.add_argument("--skill-path", required=True, help="Path to skill directory")
     parser.add_argument("--history", default=None, help="Path to history JSON (previous attempts)")
-    parser.add_argument("--model", default=None, help="Ignored — model comes from ~/.clacky/config.yml")
+    parser.add_argument("--model", default=None, help="Ignored — model comes from ~/.octo/config.yml")
     parser.add_argument("--verbose", action="store_true", help="Print thinking to stderr")
     args = parser.parse_args()
 

@@ -14,7 +14,7 @@ Output:
     exit 3  — pdf2image couldn't rasterise the PDF (usually missing poppler)
 
 Called from pdf_parser.rb as the third-tier fallback (after pdftotext and
-pdfplumber). This script is copied into ~/.clacky/parsers/ and can be
+pdfplumber). This script is copied into ~/.octo/parsers/ and can be
 edited freely by the LLM — common tweaks:
   - Change DPI (higher = better accuracy, slower + more memory)
   - Change OCR_LANG to match your document (e.g. "jpn+eng")
@@ -22,9 +22,9 @@ edited freely by the LLM — common tweaks:
   - Adjust MAX_PAGES for very large scans
 
 Environment variable overrides:
-  CLACKY_OCR_LANG       — override OCR_LANG (e.g. "eng", "jpn+eng")
-  CLACKY_OCR_MAX_PAGES  — override MAX_PAGES
-  CLACKY_OCR_DPI        — override DPI
+  OCTO_OCR_LANG       — override OCR_LANG (e.g. "eng", "jpn+eng")
+  OCTO_OCR_MAX_PAGES  — override MAX_PAGES
+  OCTO_OCR_DPI        — override DPI
 
 Install:
     macOS: brew install tesseract tesseract-lang poppler
@@ -68,9 +68,9 @@ def main():
         sys.stderr.write("Install with: pip3 install pytesseract pdf2image\n")
         sys.exit(2)
 
-    lang = os.environ.get("CLACKY_OCR_LANG", OCR_LANG)
-    max_pages = int(os.environ.get("CLACKY_OCR_MAX_PAGES", MAX_PAGES))
-    dpi = int(os.environ.get("CLACKY_OCR_DPI", DPI))
+    lang = os.environ.get("OCTO_OCR_LANG", OCR_LANG)
+    max_pages = int(os.environ.get("OCTO_OCR_MAX_PAGES", MAX_PAGES))
+    dpi = int(os.environ.get("OCTO_OCR_DPI", DPI))
 
     try:
         images = convert_from_path(path, dpi=dpi, last_page=max_pages)
