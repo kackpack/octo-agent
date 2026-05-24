@@ -3114,6 +3114,99 @@ body {
   padding: 0 0.5rem;
   flex-shrink: 0;
 }
+.sidebar-nav-row {
+  display: flex;
+  align-items: stretch;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: background .15s;
+  width: 100%;
+}
+.sidebar-nav-row:hover {
+  background: var(--color-bg-hover);
+}
+.sidebar-nav-row #btn-settings {
+  flex: 1;
+  border-radius: 0;
+  min-width: 0;
+  background: transparent !important;
+}
+.sidebar-nav-row:hover #btn-settings {
+  color: var(--color-text-primary);
+}
+.sidebar-nav-row #btn-settings.active {
+  color: var(--color-accent-primary);
+}
+
+.version-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0 0.625rem;
+  flex-shrink: 0;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background .15s;
+}
+.version-text {
+  font-size: 0.6562rem;
+  color: var(--color-text-muted);
+  font-family: monospace;
+  letter-spacing: 0.03em;
+  transition: color .15s;
+  line-height: 1;
+}
+.version-badge:hover .version-text { color: var(--color-text-tertiary); }
+.version-badge.has-update .version-text,
+.version-badge.upgrade-done .version-text { color: var(--color-accent-primary); }
+
+.version-update-dot {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  background: var(--color-warning);
+  flex-shrink: 0;
+  box-shadow: 0 0 5px var(--color-warning);
+  animation: vbadge-pulse 2s ease-in-out infinite;
+}
+@keyframes vbadge-pulse {
+  0%, 100% { opacity: 1;   box-shadow: 0 0 0.3125rem var(--color-warning); }
+  50%       { opacity: 0.4; box-shadow: 0 0 2px var(--color-warning); }
+}
+.version-spinner {
+  width: 0.5625rem;
+  height: 0.5625rem;
+  border: 1.5px solid var(--color-border-primary);
+  border-top-color: var(--color-accent-primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: vbadge-spin .7s linear infinite;
+}
+@keyframes vbadge-spin { to { transform: rotate(360deg); } }
+.version-restart-dot {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  background: #f97316;
+  flex-shrink: 0;
+  animation: vbadge-bounce 1s ease-in-out infinite;
+}
+@keyframes vbadge-bounce {
+  0%, 100% { transform: translateY(0);    opacity: 1;   }
+  50%       { transform: translateY(-0.1875rem); opacity: 0.7; }
+}
+.version-done-check {
+  font-size: 0.625rem;
+  color: #22c55e;
+  flex-shrink: 0;
+  line-height: 1;
+  animation: vbadge-popin .25s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes vbadge-popin {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
 .sidebar-nav-btn {
   display: flex;
   align-items: center;

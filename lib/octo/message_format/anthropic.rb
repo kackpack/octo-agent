@@ -47,14 +47,22 @@ module Octo
       # @param tools    [Array<Hash>] OpenAI-style tool definitions
       # @param max_tokens [Integer]
       # @param caching_enabled [Boolean]
+      # @param reasoning_effort [String, nil]
+      # @param base_url [String, nil] used to detect third-party Anthropic-compatible
+      #   endpoints (e.g. Kimi /coding, DeepSeek /anthropic) so we can strip
+      #   thinking-block signatures they cannot re-validate.
       # @return [Hash] ready to serialize as JSON body
-      def build_request_body(messages, model, tools, max_tokens, caching_enabled, reasoning_effort: nil)
+      def build_request_body(messages, model, tools, max_tokens, caching_enabled, reasoning_effort: nil, base_url: nil)
         system_messages = messages.select { |m| m[:role] == "system" }
         regular_messages = messages.reject { |m| m[:role] == "system" }
 
         system_text = system_messages.map { |m| extract_text(m[:content]) }.join("\n\n")
 
-        api_messages = regular_messages.map { |msg| to_api_message(msg, caching_enabled) }
+        # Detect non-native Anthropic endpoints that speak the Anthropic protocol
+        # but cannot validate Anthropic-proprietary thinking signatures.
+        strip_thinking_signatures = base_url && !native_anthropic_endpoint?(base_url)
+
+        api_messages = regular_messages.map { |msg| to_api_message(msg, caching_enabled, strip_thinking_signatures) }
         api_tools    = tools&.map { |t| to_api_tool(t) }
 
         if caching_enabled && api_tools&.any?
@@ -71,6 +79,13 @@ module Octo
         end
 
         body
+      end
+
+      # Returns true for the official Anthropic API endpoint.
+      # Anything else (Kimi /coding, DeepSeek /anthropic, self-hosted proxies,
+      # etc.) is treated as third-party and gets thinking signatures stripped.
+      private_class_method def self.native_anthropic_endpoint?(base_url)
+        base_url.to_s.start_with?("https://api.anthropic.com")
       end
 
       private_class_method def self.normalized_effort(effort)
@@ -182,10 +197,13 @@ module Octo
       # ── Private helpers ───────────────────────────────────────────────────────
 
       # Convert a single canonical message to Anthropic API format.
-      # caching_enabled is kept for signature compatibility but is no longer used here —
-      # cache_control markers are embedded into messages by Client#apply_message_caching
-      # before build_request_body is called.
-      private_class_method def self.to_api_message(msg, _caching_enabled)
+      # @param msg [Hash] canonical message
+      # @param _caching_enabled [Boolean] kept for signature compatibility
+      # @param strip_thinking_signatures [Boolean] when true, strip `signature`
+      #   and `data` from thinking blocks — required for third-party endpoints
+      #   (Kimi /coding, DeepSeek /anthropic, etc.) that cannot re-validate
+      #   Anthropic-proprietary signatures.
+      private_class_method def self.to_api_message(msg, _caching_enabled, strip_thinking_signatures = false)
         role      = msg[:role]
         content   = msg[:content]
         tool_calls = msg[:tool_calls]
@@ -194,7 +212,9 @@ module Octo
         if role == "assistant" && tool_calls&.any?
           blocks = []
           blocks << { type: "text", text: content } if content.is_a?(String) && !content.empty?
-          blocks.concat(content_to_blocks(content)) if content.is_a?(Array)
+          if content.is_a?(Array)
+            blocks.concat(content_to_blocks(content, strip_thinking_signatures))
+          end
 
           tool_calls.each do |tc|
             func  = tc[:function] || tc
@@ -252,7 +272,7 @@ module Octo
           # convert each block to Anthropic format via content_to_blocks.
           # Plain strings pass through unchanged.
           tool_content = if raw_content.is_a?(Array)
-                           content_to_blocks(raw_content)
+                           content_to_blocks(raw_content, strip_thinking_signatures)
                          else
                            raw_content
                          end
@@ -273,15 +293,17 @@ module Octo
         #   2. Adding cache_control to every user message causes Anthropic to treat every
         #      user message as a cache breakpoint, which invalidates the intended cache boundary
         #      and results in cache misses (cache_read=0) every turn.
-        blocks = content_to_blocks(content)
+        blocks = content_to_blocks(content, strip_thinking_signatures)
         # Anthropic rejects messages with an empty content array — use a placeholder text block.
         blocks = [{ type: "text", text: "..." }] if blocks.empty?
         { role: role, content: blocks }
       end
 
       # Convert content (String or Array) to Anthropic content block array.
-      # cache_control markers already embedded by Client#apply_message_caching are preserved.
-      private_class_method def self.content_to_blocks(content)
+      # @param content [String, Array] canonical content
+      # @param strip_thinking_signatures [Boolean] when true, strip `signature`
+      #   and `data` from thinking blocks for third-party endpoints.
+      private_class_method def self.content_to_blocks(content, strip_thinking_signatures = false)
         case content
         when String
           # Anthropic rejects blank text blocks — skip empty strings
@@ -289,7 +311,7 @@ module Octo
 
           [{ type: "text", text: content }]
         when Array
-          content.map { |b| normalize_block(b) }.compact
+          content.map { |b| normalize_block(b, strip_thinking_signatures) }.compact
         else
           str = content.to_s
           return [] if str.empty?
@@ -299,7 +321,10 @@ module Octo
       end
 
       # Normalize a single content block to Anthropic format.
-      private_class_method def self.normalize_block(block)
+      # @param block [Hash] canonical block
+      # @param strip_thinking_signatures [Boolean] when true, strip `signature`
+      #   and `data` from thinking blocks for third-party endpoints.
+      private_class_method def self.normalize_block(block, strip_thinking_signatures = false)
         return block unless block.is_a?(Hash)
 
         case block[:type]
@@ -319,6 +344,18 @@ module Octo
           block  # already Anthropic format
         when "tool_result", "tool_use"
           block  # pass through
+        when "thinking"
+          # Third-party Anthropic-compatible endpoints (Kimi /coding, DeepSeek
+          # /anthropic, etc.) return thinking blocks with real signatures that
+          # they cannot re-validate on replay.  Strip the proprietary fields
+          # and emit only the minimal shape {type, thinking} those endpoints
+          # accept, while preserving the thinking text for history validation.
+          if strip_thinking_signatures
+            thinking_text = block[:thinking] || block["thinking"] || ""
+            { type: "thinking", thinking: thinking_text }
+          else
+            block
+          end
         else
           block
         end

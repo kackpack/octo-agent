@@ -91,7 +91,7 @@ module Octo
         response = bedrock_connection.post(bedrock_endpoint(model)) { |r| r.body = body.to_json }
         parse_simple_bedrock_response(response)
       elsif anthropic_format?
-        body     = MessageFormat::Anthropic.build_request_body(messages, model, [], max_tokens, false)
+        body     = MessageFormat::Anthropic.build_request_body(messages, model, [], max_tokens, false, base_url: @base_url)
         response = anthropic_connection.post(anthropic_messages_path) { |r| r.body = body.to_json }
         parse_simple_anthropic_response(response)
       else
@@ -270,7 +270,7 @@ module Octo
       # Apply cache_control to the message that marks the cache breakpoint
       messages = apply_message_caching(messages) if caching_enabled
 
-      body = MessageFormat::Anthropic.build_request_body(messages, model, tools, max_tokens, caching_enabled, reasoning_effort: reasoning_effort)
+      body = MessageFormat::Anthropic.build_request_body(messages, model, tools, max_tokens, caching_enabled, reasoning_effort: reasoning_effort, base_url: @base_url)
       return send_anthropic_stream_request(body, on_chunk) if on_chunk
 
       response = anthropic_connection.post(anthropic_messages_path) { |r| r.body = body.to_json }
