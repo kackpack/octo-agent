@@ -157,16 +157,14 @@ module Octo
 
       # Render task completion summary
       # @param iterations [Integer] Number of iterations
-      # @param cost [Float] Cost in USD
       # @param duration [Float] Duration in seconds
       # @param cache_tokens [Integer] Cache read tokens
       # @param cache_requests [Integer] Total cache requests count
       # @param cache_hits [Integer] Cache hit requests count
       # @return [String] Formatted completion summary
-      def render_task_complete(iterations:, cost:, duration: nil, cache_tokens: nil, cache_requests: nil, cache_hits: nil)
+      def render_task_complete(iterations:, duration: nil, cache_tokens: nil, cache_requests: nil, cache_hits: nil)
         @common_component.render_task_complete(
           iterations: iterations,
-          cost: cost,
           duration: duration,
           cache_tokens: cache_tokens,
           cache_requests: cache_requests,

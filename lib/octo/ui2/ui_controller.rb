@@ -279,7 +279,6 @@ module Octo
       #   - total_tokens: total tokens
       #   - cache_write: cache write tokens
       #   - cache_read: cache read tokens
-      #   - cost: cost for this iteration
       def show_token_usage(token_data)
         theme = ThemeManager.current_theme
         pastel = Pastel.new

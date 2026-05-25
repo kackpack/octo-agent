@@ -50,7 +50,7 @@ module Octo
           cached: [:cyan, :cyan, :cyan],                          # Cached indicators
           # Status bar colors
           statusbar_path: [:bright_black, :bright_black, :bright_black],        # Path
-          statusbar_secondary: [:bright_black, :bright_black, :bright_black]    # Model/tasks/cost
+          statusbar_secondary: [:bright_black, :bright_black, :bright_black]    # Model/tasks
         }.freeze
 
         def name
