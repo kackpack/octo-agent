@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This project is a hard fork of [clacky-ai/openclacky](https://github.com/clacky-ai/openclacky) at upstream **1.1.6**, renumbered as **0.10.0** in this fork's own SemVer line. Only changes made in this fork (0.11.x and later) are tracked here. For history prior to the fork, see the upstream repository.
 
+## [0.11.2] - 2026-05-25
+
+### Fixed
+- Web UI: Skills panel (`/#skills`) could not scroll when the list of skill cards exceeded viewport height. Changed `#skills-body` from `overflow: hidden` to `overflow-y: auto` to match the Channels and Trash panels.
+- Documentation: corrected Web UI port references from `7070` to `8888` in `what-is-octo.md` and `faq.md`.
+- Documentation: fixed gem install commands from `gem install octo` to `gem install octo-agent` in `installation.md` and `windows-installation.md`.
+- Documentation: updated CLI reference to include `--no-caching` and `--no-skill-evolution` flags.
+- Documentation: removed stale `deploy` skill reference from `writing-tips.md`.
+- `product-help` skill: fixed a Ruby rescue bug where `Gem::MissingSpecError` (inherits from `ScriptError`, not `StandardError`) caused the `rescue` modifier to fail when running from source. Switched to `begin/rescue Exception` with `Dir.pwd` fallback.
+
 ## [0.11.1] - 2026-05-25
 
 ### Added
