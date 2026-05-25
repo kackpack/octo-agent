@@ -1781,6 +1781,27 @@ module Octo
         tail.empty? ? status : "#{tail}\n#{status}"
       end
 
+      def format_result_for_ui(result)
+        return nil unless result.is_a?(Hash)
+        return { type: "terminal", status: "error", error: result[:error] } if result[:error]
+        return { type: "terminal", status: "killed" } if result[:killed]
+        return { type: "terminal", status: "async", handle_id: result[:handle_id] } if result[:accepted]
+
+        cmd = result[:original_command] || result[:rewritten_command] || ""
+        ec = result[:exit_code]
+        output = result[:output].to_s
+
+        {
+          type: "terminal",
+          command: cmd,
+          exit_code: ec,
+          output_preview: output.slice(0, 800),
+          output_truncated: result[:output_truncated] || false,
+          full_output_file: result[:full_output_file],
+          status: ec.nil? ? "running" : (ec.zero? ? "success" : "failed")
+        }
+      end
+
       # Extract the last DISPLAY_TAIL_LINES non-empty lines of output so the
       # user can see what actually happened in this poll, not just a "128B"
       # byte-count. Output is USUALLY already cleaned by OutputCleaner, but

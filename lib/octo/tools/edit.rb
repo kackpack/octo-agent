@@ -131,6 +131,16 @@ module Octo
         "Modified #{replacements} occurrence#{replacements > 1 ? "s" : ""}"
       end
 
+      def format_result_for_ui(result)
+        return nil if result[:error]
+        {
+          type: "edit",
+          path: result[:path],
+          operation: "replace",
+          occurrences: result[:replacements] || 1
+        }
+      end
+
       # Scrub invalid UTF-8 byte sequences (see file_reader.rb for rationale).
       private def safe_utf8(str)
         return str if str.nil?

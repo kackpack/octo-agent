@@ -214,6 +214,32 @@ module Octo
         end
       end
 
+      def format_result_for_ui(result)
+        return nil if result[:error]
+
+        matches = result[:results]&.flat_map do |r|
+          r[:matches]&.map do |m|
+            {
+              file: r[:file],
+              line_no: m[:line_number],
+              line: m[:line],
+              context: m[:context]
+            }
+          end
+        end&.compact || []
+
+        {
+          type: "search",
+          pattern: result[:pattern],
+          path: result[:path],
+          matches: matches.first(20),
+          total_matches: result[:total_matches],
+          files_with_matches: result[:files_with_matches],
+          truncated: result[:truncated],
+          truncation_reason: result[:truncation_reason]
+        }
+      end
+
       # Format result for LLM consumption - return a compact version to save tokens
       def format_result_for_llm(result)
         # If there's an error, return it as-is

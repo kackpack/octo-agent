@@ -148,9 +148,9 @@ module Octo
         forward_to_subscribers { |sub| sub.show_tool_call(name, args_data) }
       end
 
-      def show_tool_result(result)
+      def show_tool_result(result, ui_payload: nil)
         @live_tool_call = nil   # tool finished — no longer in-flight
-        emit("tool_result", result: result)
+        emit("tool_result", result: result, ui_payload: ui_payload)
         forward_to_subscribers { |sub| sub.show_tool_result(result) }
       end
 

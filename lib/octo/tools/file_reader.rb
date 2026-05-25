@@ -282,6 +282,59 @@ module Octo
         "Read #{lines} lines#{suffix}#{truncated ? ' (truncated)' : ''}"
       end
 
+      def format_result_for_ui(result)
+        return nil if result[:error]
+
+        if result[:is_directory] || result['is_directory']
+          entries = result[:entries] || []
+          return {
+            type: "file_list",
+            path: result[:path],
+            entries: entries.map { |e| { name: e, is_dir: e.end_with?("/") } },
+            total: result[:entries_count] || entries.size
+          }
+        end
+
+        if result[:binary] || result['binary']
+          return {
+            type: "file_read",
+            path: result[:path],
+            is_binary: true,
+            format: result[:format],
+            size_bytes: result[:size_bytes]
+          }
+        end
+
+        {
+          type: "file_read",
+          path: result[:path],
+          lines_read: result[:lines_read],
+          total_lines: result[:total_lines],
+          truncated: result[:truncated] || false,
+          content_preview: result[:content]&.slice(0, 500),
+          language: detect_language(result[:path])
+        }
+      end
+
+      private def detect_language(path)
+        ext = File.extname(path.to_s).downcase
+        LANG_MAP = {
+          ".rb" => "ruby", ".py" => "python", ".js" => "javascript",
+          ".ts" => "typescript", ".jsx" => "jsx", ".tsx" => "tsx",
+          ".java" => "java", ".go" => "go", ".rs" => "rust",
+          ".c" => "c", ".cpp" => "cpp", ".h" => "c",
+          ".cs" => "csharp", ".php" => "php", ".swift" => "swift",
+          ".kt" => "kotlin", ".scala" => "scala", ".r" => "r",
+          ".sh" => "bash", ".zsh" => "bash", ".bash" => "bash",
+          ".yaml" => "yaml", ".yml" => "yaml", ".json" => "json",
+          ".xml" => "xml", ".html" => "html", ".css" => "css",
+          ".scss" => "scss", ".sass" => "scss", ".less" => "less",
+          ".md" => "markdown", ".sql" => "sql", ".dockerfile" => "dockerfile",
+          ".gemfile" => "ruby", ".rake" => "ruby"
+        }.freeze
+        LANG_MAP[ext]
+      end
+
       # Format result for LLM - handles both text and binary (image) content
       # This method is called by the agent to format tool results before sending to LLM
       def format_result_for_llm(result)

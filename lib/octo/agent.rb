@@ -1398,7 +1398,9 @@ module Octo
           else
             # Use tool's format_result method to get display-friendly string
             formatted_result = tool.respond_to?(:format_result) ? tool.format_result(result) : result.to_s
-            @ui&.show_tool_result(formatted_result)
+            # Also try to get a structured UI representation for rich rendering
+            ui_payload = tool.respond_to?(:format_result_for_ui) ? tool.format_result_for_ui(result) : nil
+            @ui&.show_tool_result(formatted_result, ui_payload: ui_payload)
           end
 
           results << build_success_result(call, result)

@@ -64,6 +64,44 @@ module Octo
         end
       end
 
+      # Format tool result as a structured hash for rich UI rendering.
+      # When a tool implements this, the WebUI can render a beautiful
+      # card instead of a plain text blob.
+      #
+      # @param result [Object] The result returned by execute
+      # @return [Hash, nil] A hash with :type and tool-specific fields,
+      #   or nil to fall back to plain-text format_result.
+      #
+      # Supported types and their schemas:
+      #
+      #   { type: "file_read", path:, lines_read:, total_lines:,
+      #     truncated:, content_preview:, language: }
+      #
+      #   { type: "file_list", path:, entries:[{name, is_dir}], total }
+      #
+      #   { type: "search", pattern:, path:, matches:[{file, line_no, line, context?}],
+      #     total_matches, files_with_matches, truncated }
+      #
+      #   { type: "terminal", command:, exit_code:, output_preview:,
+      #     output_truncated:, full_output_file? }
+      #
+      #   { type: "web_fetch", url:, title?, content_preview: }
+      #
+      #   { type: "web_search", query:, results:[{title, url, snippet}] }
+      #
+      #   { type: "edit", path:, operation:, occurrences: }
+      #
+      #   { type: "write", path:, is_new_file:, size_bytes: }
+      #
+      #   { type: "todo", action:, todos:[{id, task, status}] }
+      #
+      #   { type: "browser", action:, url?, title?, content_preview? }
+      #
+      #   { type: "generic", title:, content:, status: "ok|error|warning" }
+      def format_result_for_ui(result)
+        nil
+      end
+
       # Convert to OpenAI function calling format
       def to_function_definition
         {

@@ -198,6 +198,18 @@ module Octo
         end
       end
 
+      def format_result_for_ui(result)
+        return nil if result[:error]
+        {
+          type: "web_fetch",
+          url: result[:url],
+          title: result[:title],
+          content_preview: result[:content]&.[](0, 500),
+          truncated: result[:truncated] || false,
+          status_code: result[:status_code]
+        }
+      end
+
       # Format result for LLM consumption - return compact version to save tokens
       def format_result_for_llm(result)
         # Return error as-is

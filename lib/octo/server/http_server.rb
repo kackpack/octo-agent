@@ -97,8 +97,10 @@ module Octo
         nil
       end
 
-      def show_tool_result(result)
-        @events << { type: "tool_result", session_id: @session_id, result: result }
+      def show_tool_result(result, ui_payload: nil)
+        ev = { type: "tool_result", session_id: @session_id, result: result }
+        ev[:ui_payload] = ui_payload if ui_payload
+        @events << ev
       end
 
       def show_token_usage(token_data)

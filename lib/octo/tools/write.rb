@@ -63,6 +63,15 @@ module Octo
         bytes = result[:bytes_written] || result['bytes_written'] || 0
         "Written #{bytes} bytes"
       end
+
+      def format_result_for_ui(result)
+        return nil if result[:error]
+        {
+          type: "write",
+          path: result[:path],
+          size_bytes: result[:bytes_written] || 0
+        }
+      end
     end
   end
 end

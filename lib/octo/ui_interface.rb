@@ -9,7 +9,7 @@ module Octo
     # @param files   [Array<Hash>] extracted file refs: [{ name:, path:, inline: }]
     def show_assistant_message(content, files:); end
     def show_tool_call(name, args); end
-    def show_tool_result(result); end
+    def show_tool_result(result, ui_payload: nil); end
     def show_tool_stdout(lines); end
     def show_tool_error(error); end
     def show_tool_args(formatted_args); end

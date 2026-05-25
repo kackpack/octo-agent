@@ -243,6 +243,18 @@ module Octo
           "[OK] Found #{count} results#{provider}"
         end
       end
+
+      def format_result_for_ui(result)
+        return nil if result[:error]
+        {
+          type: "web_search",
+          query: result[:query],
+          results: (result[:results] || []).first(5).map do |r|
+            { title: r[:title], url: r[:url], snippet: r[:snippet] }
+          end,
+          total: result[:count] || 0
+        }
+      end
     end
   end
 end
