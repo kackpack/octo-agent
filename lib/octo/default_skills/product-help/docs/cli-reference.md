@@ -60,6 +60,8 @@ octo server [OPTIONS]
 | `-p, --port=N` | Listen port (default: `8888`) |
 | `--no-compression` | Disable message compression |
 | `--no-memory` | Disable automatic memory updates |
+| `--no-caching` | Disable prompt caching |
+| `--no-skill-evolution` | Disable automatic skill evolution |
 
 ### `octo tree`
 

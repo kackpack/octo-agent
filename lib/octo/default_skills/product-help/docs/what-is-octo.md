@@ -3,7 +3,7 @@
 Octo is a **functionality-first** AI agent with three equal interfaces:
 
 - **Terminal (CLI)** — Interactive agent sessions in your shell
-- **Web UI** — Full chat interface with multi-session support at `localhost:7070`
+- **Web UI** — Full chat interface with multi-session support at `localhost:8888`
 - **Instant Messaging** — Feishu, WeChat, WeCom, Discord, Telegram
 
 All three interfaces are first-class citizens with identical capabilities.

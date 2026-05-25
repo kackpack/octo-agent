@@ -23,7 +23,7 @@ Yes. Set `base_url` to any OpenAI-compatible or Anthropic-compatible endpoint.
 ### Q: How do I update Octo?
 
 ```bash
-gem update octo
+gem update octo-agent
 ```
 
 Or pull latest and `bundle install` if running from source.
@@ -65,14 +65,14 @@ This performs a hot restart with zero downtime.
 ### Restart or Upgrade Failure
 
 If restart fails:
-1. Check if another process is using the port (`lsof -i :7070` or `:8888`)
+1. Check if another process is using the port (`lsof -i :8888`)
 2. Kill the stale process and restart
-3. If issues persist, run `gem uninstall octo && gem install octo` for a clean reinstall
+3. If issues persist, run `gem uninstall octo-agent && gem install octo-agent` for a clean reinstall
 
 ### Downgrade
 
 ```bash
-gem install octo -v <desired-version>
+gem install octo-agent -v <desired-version>
 ```
 
 ## Session Management

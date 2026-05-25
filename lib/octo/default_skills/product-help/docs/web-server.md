@@ -15,6 +15,8 @@ octo server --port 8080        # Custom port
 octo server --host 0.0.0.0     # Listen on all interfaces
 octo server --no-compression   # Disable message compression
 octo server --no-memory        # Disable automatic memory updates
+octo server --no-caching       # Disable prompt caching
+octo server --no-skill-evolution  # Disable automatic skill evolution
 ```
 
 ## Features

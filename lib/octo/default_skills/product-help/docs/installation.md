@@ -7,7 +7,7 @@
 ## RubyGem
 
 ```bash
-gem install octo
+gem install octo-agent
 ```
 
 ## One-line Installer (macOS / Ubuntu)

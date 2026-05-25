@@ -13,7 +13,7 @@ powershell -c "& ([scriptblock]::Create((irm 'https://raw.githubusercontent.com/
 3. Run:
 
 ```powershell
-gem install octo
+gem install octo-agent
 ```
 
 ## WSL (Recommended)

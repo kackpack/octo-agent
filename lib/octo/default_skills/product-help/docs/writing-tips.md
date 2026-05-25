@@ -5,7 +5,7 @@
 The `description` field is how the agent decides when to use your skill. Write it as a condition:
 
 ```yaml
-description: 'Use this skill when the user wants to deploy a Rails app to Railway'
+description: 'Use this skill when the user wants to set up a new Ruby on Rails project'
 ```
 
 ## Be Specific
