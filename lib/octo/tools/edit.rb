@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "diffy"
+
 module Octo
   module Tools
     class Edit < Base
@@ -47,7 +49,8 @@ module Octo
           # Scrub invalid UTF-8 bytes at read time — otherwise editing a file
           # that contains non-UTF-8 bytes would poison history / error messages
           # and cause JSON.generate to fail during replay.
-          content = safe_utf8(File.read(path))
+          original_content = safe_utf8(File.read(path))
+          content = original_content
 
           # Find matching string using layered strategy (shared with preview)
           match_result = Utils::StringMatcher.find_match(content, old_string)
@@ -72,10 +75,19 @@ module Octo
 
           File.write(path, content)
 
+          # Generate a unified diff for UI display. Limit to ~40 lines so
+          # large-file edits don't flood the Web UI with noise.
+          diff = Diffy::Diff.new(original_content, content, context: 3).to_s(:text)
+          diff_lines = diff.lines
+          if diff_lines.size > 40
+            diff = diff_lines.first(37).join + "...\n(#{(diff_lines.size - 37)} more lines)\n"
+          end
+
           {
             path: File.expand_path(path),
             replacements: replace_all ? occurrences : 1,
-            error: nil
+            error: nil,
+            diff: diff
           }
         rescue Errno::EACCES => e
           { error: "Permission denied: #{e.message}" }
@@ -137,7 +149,8 @@ module Octo
           type: "edit",
           path: result[:path],
           operation: "replace",
-          occurrences: result[:replacements] || 1
+          occurrences: result[:replacements] || 1,
+          diff: result[:diff]
         }
       end
 

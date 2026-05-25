@@ -110,6 +110,8 @@ module Octo
       @inbox_run_pending = false   # Set true after enqueue_user_message decides to spawn a run; cleared at run() entry. Dedupes concurrent spawns.
       @state_mutex = Mutex.new     # Protects @in_run_loop, @inbox, @inbox_run_pending, @current_run_thread, @discard_threshold
       @run_mutex = Mutex.new       # Serializes every Agent#run invocation regardless of caller
+      @checkpoint_index = 0        # Tracks how many messages have been persisted to incremental log
+      @on_checkpoint = nil         # Callback proc(messages) for incremental persistence
       @current_run_thread = nil    # Thread currently inside run()'s body — set under @state_mutex; used by interrupt_current_run!
       @discard_threshold = nil     # Time. Stale run attempts whose enqueue time predates this are dropped.
 
@@ -151,6 +153,32 @@ module Octo
 
     def add_hook(event, &block)
       @hooks.add(event, &block)
+    end
+
+    # Register a callback that receives newly-added messages after each
+    # iteration checkpoint. Used by the server layer for incremental
+    # persistence (.jsonl crash-recovery logs).
+    def on_checkpoint(&block)
+      @on_checkpoint = block
+    end
+
+    # Reset the checkpoint cursor so the next checkpoint! captures
+    # everything added from this point forward.
+    def reset_checkpoint!
+      @checkpoint_index = @history.to_a.size
+    end
+
+    # Emit any messages added to @history since the last checkpoint
+    # through the registered @on_callback handler.
+    def checkpoint!
+      return unless @on_checkpoint
+
+      current = @history.to_a
+      new_msgs = current[@checkpoint_index..] || []
+      return if new_msgs.empty?
+
+      @on_checkpoint.call(new_msgs)
+      @checkpoint_index = current.size
     end
 
     # Switch this session to a different model, identified by its stable
@@ -363,6 +391,10 @@ module Octo
           # run completes — latency drops from "minutes" to "one LLM turn".
           drain_inbox_into_history!(task_id)
 
+          # Persist drained inbox messages immediately so they survive a
+          # crash during the upcoming think() call.
+          checkpoint!
+
           # Think: LLM reasoning with tool support
           response = think
           @last_token_usage = response[:token_usage] if response && response[:token_usage]
@@ -373,7 +405,17 @@ module Octo
           end
 
           # Skip if compression happened (response is nil)
-          next if response.nil?
+          if response.nil?
+            checkpoint!
+            next
+          end
+
+          # Checkpoint immediately after think() so the assistant message
+          # (and any tool_calls it contains) is persisted before we enter
+          # act(). If a crash happens between think() and the next
+          # iteration-boundary checkpoint, recovery can at least restore
+          # the model's intent.
+          checkpoint!
 
           # [DIAG] Only log when finish_reason=="stop" AND tool_calls non-empty —
           # the suspicious combo that indicates an upstream-truncated tool_use
@@ -450,9 +492,11 @@ module Octo
                 session_id: @session_id,
                 iteration: @iterations
               )
+              checkpoint!
               next
             end
 
+            checkpoint!
             break
           end
 
@@ -469,6 +513,7 @@ module Octo
             awaiting_user_feedback = true
             observe(response, action_result[:tool_results])
             flush_pending_injections
+            checkpoint!
             break
           end
 
@@ -491,14 +536,20 @@ module Octo
                 content: "The user has a question/feedback for you: #{action_result[:feedback]}\n\nPlease respond to the user's question/feedback before continuing with any actions.",
                 system_injected: true
               })
+              checkpoint!
               # Continue loop to let agent respond to feedback
               next
             else
               # User just said "no" without feedback - stop and wait
               @ui&.show_assistant_message("Tool execution was denied. Please give more instructions...", files: [])
+              checkpoint!
               break
             end
           end
+
+          # Normal iteration end — persist incremental checkpoint before
+          # the next loop iteration so crash recovery captures this turn.
+          checkpoint!
         end
 
       result = build_result
@@ -1172,6 +1223,10 @@ module Octo
         # the recursive think() call below will reopen a new one.
         @ui&.show_progress(phase: "done")
         @ui&.show_warning("Response truncated (#{@task_truncation_count}/3). Retrying with smaller steps...")
+
+        # Persist the truncated assistant message and the system retry hint
+        # before the recursive think() so they survive a crash mid-retry.
+        checkpoint!
 
         # Recursively retry
         return think

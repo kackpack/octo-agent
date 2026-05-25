@@ -196,6 +196,125 @@ module Octo
       end.size
     end
 
+    # ── Incremental message log (.jsonl) for crash recovery ──────────────────
+    #
+    # During an agent run, messages are appended to a per-session .jsonl file
+    # after each iteration (think + act + observe). On normal completion the
+    # .jsonl is deleted because the full session is saved to .json. If the
+    # server crashes (kill -9, OOM, etc.) the .jsonl survives and is merged
+    # back into the session on next startup.
+    #
+    # Each line is a standalone JSON object: { "t": unix_timestamp, "msg": message_hash }
+    # This makes the file resilient to partial writes — we can parse every
+    # complete line and drop the trailing incomplete one.
+
+    def append_message_log(session_id, messages)
+      return if messages.nil? || messages.empty?
+
+      path = jsonl_path(session_id)
+      File.open(path, "a") do |f|
+        messages.each do |msg|
+          f.puts JSON.generate({ t: Time.now.to_f, msg: msg })
+        end
+      end
+    rescue => e
+      Octo::Logger.warn("session_manager.append_message_log_failed",
+        session_id: session_id,
+        error: e.message
+      )
+    end
+
+    def read_message_log(session_id)
+      path = jsonl_path(session_id)
+      return [] unless File.exist?(path)
+
+      File.readlines(path).filter_map do |line|
+        next if line.strip.empty?
+
+        parsed = JSON.parse(line, symbolize_names: true)
+        parsed[:msg]
+      rescue JSON::ParserError
+        nil
+      end
+    rescue => e
+      Octo::Logger.warn("session_manager.read_message_log_failed",
+        session_id: session_id,
+        error: e.message
+      )
+      []
+    end
+
+    def delete_message_log(session_id)
+      path = jsonl_path(session_id)
+      File.delete(path) if File.exist?(path)
+    rescue => e
+      Octo::Logger.warn("session_manager.delete_message_log_failed",
+        session_id: session_id,
+        error: e.message
+      )
+    end
+
+    # Scan for orphaned .jsonl files and merge their messages back into the
+    # corresponding session .json files. Called once at server startup.
+    def recover_jsonl_sessions
+      jsonl_files = Dir.glob(File.join(@sessions_dir, "*.jsonl"))
+      return 0 if jsonl_files.empty?
+
+      recovered = 0
+      jsonl_files.each do |path|
+        session_id = File.basename(path, ".jsonl")
+        session = load(session_id)
+        unless session
+          Octo::Logger.warn("session_manager.recover_jsonl_no_session",
+            session_id: session_id,
+            path: path
+          )
+          next
+        end
+
+        log_messages = read_message_log(session_id)
+        next if log_messages.empty?
+
+        existing = session[:messages] || []
+        # Avoid duplicates: if the last N messages of existing already match
+        # the first N of log_messages, skip the overlap.
+        merged = merge_without_duplicates(existing, log_messages)
+        session[:messages] = merged
+        session[:updated_at] = Time.now.iso8601
+
+        save(session)
+        delete_message_log(session_id)
+        recovered += 1
+
+        Octo::Logger.info("session_manager.recovered_from_jsonl",
+          session_id: session_id,
+          messages_recovered: log_messages.size,
+          total_messages: merged.size
+        )
+      end
+      recovered
+    end
+
+    private def merge_without_duplicates(existing, incoming)
+      return incoming if existing.empty?
+      return existing if incoming.empty?
+
+      # Find the longest suffix of `existing` that matches a prefix of `incoming`
+      max_overlap = [existing.size, incoming.size].min
+      overlap = 0
+      max_overlap.downto(1) do |n|
+        if existing.last(n) == incoming.first(n)
+          overlap = n
+          break
+        end
+      end
+
+      existing + incoming[overlap..]
+    end
+
+    private def jsonl_path(session_id)
+      File.join(@sessions_dir, "#{session_id}.jsonl")
+    end
 
     def ensure_sessions_dir
       FileUtils.mkdir_p(@sessions_dir) unless Dir.exist?(@sessions_dir)

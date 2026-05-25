@@ -569,6 +569,11 @@ module Octo
         # Restore up to 5 sessions per source type from disk into the registry.
         @registry.restore_from_disk(n: 5)
 
+        # Recover any orphaned .jsonl incremental logs from crashed sessions
+        # and merge them back into their parent session .json files.
+        recovered = @session_manager.recover_jsonl_sessions
+        Octo::Logger.info("http_server.recovered_jsonl_sessions", count: recovered) if recovered > 0
+
         # If nothing was restored (no persisted sessions), create a fresh default.
         unless @registry.list(limit: 1).any?
           working_dir = default_working_dir
@@ -3044,47 +3049,64 @@ module Octo
         @registry.update(session_id, status: :running)
         broadcast_session_update(session_id)
 
+        # Wire up incremental checkpoint callback before the thread starts.
+        # Each completed iteration (think + act + observe) appends new messages
+        # to a .jsonl file so crash recovery can restore them on restart.
+        agent.reset_checkpoint!
+        agent.on_checkpoint do |msgs|
+          @session_manager.append_message_log(session_id, msgs)
+        end
+
         thread = Thread.new do
-          result = task.call
-          @registry.update(session_id, status: :idle, error: nil)
-          broadcast_session_update(session_id)
-          @session_manager.save(agent.to_session_data(status: :success))
+          begin
+            result = task.call
+            @registry.update(session_id, status: :idle, error: nil)
+            broadcast_session_update(session_id)
+            @session_manager.save(agent.to_session_data(status: :success))
 
-          # If the agent run left user messages in the inbox, spawn a
-          # registered drain-only run so they are processed under the same
-          # interrupt / idle-timer lifecycle as any other task.
-          if agent.inbox_user_message_count > 0
-            run_agent_task(session_id, agent) { agent.run }
+            # If the agent run left user messages in the inbox, spawn a
+            # registered drain-only run so they are processed under the same
+            # interrupt / idle-timer lifecycle as any other task.
+            if agent.inbox_user_message_count > 0
+              run_agent_task(session_id, agent) { agent.run }
+            end
+
+            # Start idle compression timer now that the agent is idle
+            idle_timer&.start
+          rescue Octo::AgentInterrupted
+            @registry.update(session_id, status: :idle)
+            broadcast_session_update(session_id)
+            broadcast(session_id, { type: "interrupted", session_id: session_id })
+            # Re-broadcast inbox queue status so the frontend shows the
+            # accurate pending count after interruption (messages queued
+            # during the run are preserved, not discarded).
+            pending = agent.inbox_user_message_count
+            s = nil
+            @registry.with_session(session_id) { |sess| s = sess }
+            s[:ui]&.update_user_message_queue_status(pending: pending)
+            @session_manager.save(agent.to_session_data(status: :interrupted))
+
+            # If the inbox still has queued messages after interruption,
+            # immediately resume draining them — don't go idle.
+            if pending > 0
+              run_agent_task(session_id, agent) { agent.run }
+            end
+          rescue => e
+            @registry.update(session_id, status: :error, error: e.message)
+            broadcast_session_update(session_id)
+            # Route error through web_ui so channel subscribers (飞书/企微) receive it too.
+            web_ui = nil
+            @registry.with_session(session_id) { |s| web_ui = s[:ui] }
+            web_ui&.show_error(e.message)
+            @session_manager.save(agent.to_session_data(status: :error, error_message: e.message))
+          ensure
+            # Normal completion (success / interrupted / error) means the
+            # full session has been saved to .json — the .jsonl is now
+            # redundant. On server crash (kill -9) this ensure does NOT run,
+            # leaving the .jsonl behind for recover_jsonl_sessions on restart.
+            @session_manager.delete_message_log(session_id)
+            agent.on_checkpoint(nil)
           end
-
-          # Start idle compression timer now that the agent is idle
-          idle_timer&.start
-        rescue Octo::AgentInterrupted
-          @registry.update(session_id, status: :idle)
-          broadcast_session_update(session_id)
-          broadcast(session_id, { type: "interrupted", session_id: session_id })
-          # Re-broadcast inbox queue status so the frontend shows the
-          # accurate pending count after interruption (messages queued
-          # during the run are preserved, not discarded).
-          pending = agent.inbox_user_message_count
-          s = nil
-          @registry.with_session(session_id) { |sess| s = sess }
-          s[:ui]&.update_user_message_queue_status(pending: pending)
-          @session_manager.save(agent.to_session_data(status: :interrupted))
-
-          # If the inbox still has queued messages after interruption,
-          # immediately resume draining them — don't go idle.
-          if pending > 0
-            run_agent_task(session_id, agent) { agent.run }
-          end
-        rescue => e
-          @registry.update(session_id, status: :error, error: e.message)
-          broadcast_session_update(session_id)
-          # Route error through web_ui so channel subscribers (飞书/企微) receive it too.
-          web_ui = nil
-          @registry.with_session(session_id) { |s| web_ui = s[:ui] }
-          web_ui&.show_error(e.message)
-          @session_manager.save(agent.to_session_data(status: :error, error_message: e.message))
         end
         @registry.with_session(session_id) { |s| s[:thread] = thread }
       end

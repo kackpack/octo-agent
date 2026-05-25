@@ -1108,6 +1108,8 @@ RSpec.describe Octo::Server::HttpServer do
       allow(mock_agent).to receive(:run).and_raise(Octo::AgentInterrupted, "Interrupted")
       allow(mock_agent).to receive(:inbox_user_message_count) { pending_calls.shift || 0 }
       allow(mock_agent).to receive(:to_session_data).and_return({})
+      allow(mock_agent).to receive(:reset_checkpoint!)
+      allow(mock_agent).to receive(:on_checkpoint)
 
       captured_queue_status = nil
       mock_ui = double("UI")
