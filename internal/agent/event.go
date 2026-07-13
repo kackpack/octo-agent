@@ -93,6 +93,12 @@ const (
 	// full history was kept. Observers should clear any compaction indicator.
 	EventCompactDone EventKind = "compact_done"
 
+	// EventSnip fires when the cheap snip tier drops whole user turns
+	// (zero LLM cost) to bring context under the compaction trigger without
+	// triggering a summarise. Compact carries BeforeTokens/AfterTokens;
+	// SnippedTurns counts how many user turns were dropped.
+	EventSnip EventKind = "snip"
+
 	// EventGoalUpdated fires when the session goal record changes during a
 	// turn — usage accounting moved the counters or a budget crossing flipped
 	// the status. Goal carries the updated snapshot. Mutations made outside a
@@ -129,6 +135,7 @@ const EventToolOutputCap = 8 * 1024
 //   - EventCompactStarted:  Compact (BeforeTokens, FoldedMsgs, KeptTurns, MaxTokens)
 //   - EventCompactProgress: Chunk, Compact (SummaryTokens, MaxTokens)
 //   - EventCompactDone:     Compact (BeforeTokens, AfterTokens, FoldedMsgs)
+//   - EventSnip:            Compact (BeforeTokens, AfterTokens, SnippedTurns)
 //   - EventGoalUpdated:     Goal
 //
 // JSON tags are included so the WS transport (M8 web server) can marshal
@@ -180,6 +187,9 @@ type CompactStats struct {
 	// compaction was handled entirely by the cheap reclamation tier — no
 	// summarize call was made.
 	ReclaimedTokens int `json:"reclaimed_tokens,omitempty"`
+	// SnippedTurns is how many whole user turns the snip tier dropped
+	// (EventSnip only).
+	SnippedTurns int `json:"snipped_turns,omitempty"`
 	// MaxTokens is the summary's output-token cap, for a "N / max" readout.
 	MaxTokens int `json:"max_tokens,omitempty"`
 }

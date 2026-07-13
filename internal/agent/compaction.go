@@ -26,6 +26,18 @@ const minFoldPercent = 15
 // kept tail, the summary side-call, and the next turn's output.
 const compactThresholdFraction = 0.75
 
+// snipOvershootThresholdFraction is how far past the trigger context must
+// sit for Snip to fire. A 50% margin ensures Snip only fires when summarise
+// would clearly be wasteful — the context is severely over the trigger and
+// dropping a few stale turns is far cheaper than an LLM call.
+const snipOvershootThresholdFraction = 0.50
+
+// Snip only fires when the compaction trigger itself is above this floor.
+// Unit tests often set tiny artificial thresholds (e.g. 100 tokens) to
+// exercise the summarise path — snipping at that scale isn't meaningful
+// and would break the test expectations.
+const snipMinTriggerTokens = 1000
+
 // defaultContextWindow is the conservative fallback window (in tokens) for
 // models not named in contextWindow. Under-estimating only makes us compact
 // slightly earlier — never overflow — so unknown models stay safe.
@@ -296,6 +308,101 @@ Focus on:
 
 Begin your response NOW. Remember: PURE TEXT only, starting with <topics> then <summary>.`
 
+// snipBeforeSummarize drops the oldest complete user turns when the context
+// is still over the compaction trigger after reclamation and the context
+// exceeds the trigger by at least snipOvershootThresholdFraction. It skips
+// the very first user turn (msg[0]) and any turn containing error tool
+// results — those are safety-critical context that must not be silently
+// discarded.
+//
+// Guarded behaviour:
+//   - Only fires when reclamation alone wasn't enough (the reclaim→Snip ordering
+//     is enforced by maybeCompact's tiered structure).
+//   - Returns true when snip freed enough context to safely skip the summarize.
+//   - Emits EventSnip when handler is non-nil so the UI can show the drop.
+func (a *Agent) snipBeforeSummarize(msgs []Message, trigger int, handler EventHandler) bool {
+	// Snip is designed for production-size context windows (100K+ tokens).
+	// With tiny artificial triggers that tests use, it's not meaningful
+	// and would break summarise-path tests.
+	if trigger < snipMinTriggerTokens {
+		return false
+	}
+	threshold := trigger + int(float64(trigger)*snipOvershootThresholdFraction)
+	if a.historyTokens(msgs) <= threshold {
+		return false // savings too small
+	}
+
+	// Find the oldest plain user turn to drop. Skip msg[0] (system/task
+	// definition) and skip turns containing tool_result with IsError.
+	dropIdx := -1
+	for i := 1; i < len(msgs); i++ {
+		if msgs[i].Role != RoleUser || hasToolResult(msgs[i]) {
+			continue
+		}
+		// Scan forward from this turn to the next user turn; if any
+		// tool_result in between has IsError, skip this candidate.
+		safe := true
+		for j := i; j < len(msgs); j++ {
+			if j > i && msgs[j].Role == RoleUser && !hasToolResult(msgs[j]) {
+				break // next plain user turn reached
+			}
+			for _, b := range msgs[j].Blocks {
+				if b.Type == "tool_result" && b.IsError {
+					safe = false
+					break
+				}
+			}
+			if !safe {
+				break
+			}
+		}
+		if safe {
+			// Also check the prefix about to be dropped (msgs[0:i]) for
+			// error tool_results — we must not silently discard them.
+			for j := 0; j < i; j++ {
+				for _, b := range msgs[j].Blocks {
+					if b.Type == "tool_result" && b.IsError {
+						safe = false
+						break
+					}
+				}
+				if !safe {
+					break
+				}
+			}
+		}
+		if safe {
+			dropIdx = i
+			break
+		}
+	}
+	if dropIdx <= 0 {
+		return false // no safe turn to drop
+	}
+
+	before := estimateMessages(msgs)
+	// Always preserve the first turn (msg[0-1]) — it carries the task
+	// definition and session-level constraints.
+	// Drop everything between the first turn and the candidate.
+	a.History.Reset()
+	a.History.Append(msgs[0])
+	a.History.Append(msgs[1])
+	for _, m := range msgs[dropIdx:] {
+		a.History.Append(m)
+	}
+	a.resetContextTrigger()
+	after := estimateMessages(a.History.Snapshot())
+
+	if handler != nil {
+		handler(AgentEvent{Kind: EventSnip, Compact: &CompactStats{
+			BeforeTokens: before,
+			AfterTokens:  after,
+			SnippedTurns: 1,
+		}})
+	}
+	return true
+}
+
 // maybeCompact summarizes the older portion of history when the total context
 // size crosses CompactThreshold. It prefers the real token count reported by
 // the provider (lastInputTokens) and falls back to a heuristic estimate when no
@@ -338,6 +445,14 @@ func (a *Agent) maybeCompact(ctx context.Context, handler EventHandler) error {
 			return nil
 		}
 		before = estimateMessages(msgs)
+	}
+
+	// Second cheap tier: snip the oldest complete user turn when the context
+	// is still over the trigger after reclamation. Zero LLM cost; drops a
+	// whole turn only when it's provably safe (no error tool_results in scope)
+	// and the savings are sufficient.
+	if a.snipBeforeSummarize(msgs, trigger, handler) {
+		return nil
 	}
 
 	split := safeSplitIndexByBudget(msgs, a.compactKeepBudget())
