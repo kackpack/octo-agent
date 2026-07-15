@@ -21,12 +21,6 @@ type History struct {
 	// pure length comparison can't detect this: a rewrite can leave history at
 	// or above the persisted length while changing earlier messages.
 	rewritten bool
-
-	// collapser records which tool_result blocks have been collapsed via
-	// reclaimStaleToolResults so Snapshot() can project the placeholder
-	// at read time without mutating the underlying messages array (and thus
-	// without invalidating the provider's prompt cache prefix).
-	collapser Collapser
 }
 
 // NewHistory returns an empty History.
@@ -43,16 +37,11 @@ func (h *History) Append(m Message) {
 
 // Snapshot returns a copy of the message slice safe to iterate without holding
 // the lock. The returned slice's backing array is fresh; callers can mutate it.
-// Tool_result blocks that have been collapsed via reclaim are replaced with
-// their placeholder text before returning, without mutating the stored history.
 func (h *History) Snapshot() []Message {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 	out := make([]Message, len(h.messages))
 	copy(out, h.messages)
-	if h.collapser.len() > 0 {
-		h.collapser.project(out)
-	}
 	return out
 }
 
@@ -69,7 +58,6 @@ func (h *History) Reset() {
 	defer h.mu.Unlock()
 	h.messages = nil
 	h.rewritten = true
-	h.collapser.clear()
 }
 
 // TruncateTo keeps only the first n messages.
@@ -80,7 +68,6 @@ func (h *History) TruncateTo(n int) {
 	if n < len(h.messages) {
 		h.messages = h.messages[:n]
 		h.rewritten = true
-		h.collapser.clear()
 	}
 }
 
@@ -92,7 +79,6 @@ func (h *History) ReplaceAll(msgs []Message) {
 	h.messages = make([]Message, len(msgs))
 	copy(h.messages, msgs)
 	h.rewritten = true
-	h.collapser.clear()
 }
 
 // Tail returns the last n messages (or all if fewer).
@@ -121,7 +107,6 @@ func (h *History) replaceLast(m Message) {
 	}
 	h.messages[len(h.messages)-1] = m
 	h.rewritten = true
-	h.collapser.remove(len(h.messages) - 1)
 }
 
 // RewriteDirty reports whether history has been rewritten (any non-append
